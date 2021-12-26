@@ -1,12 +1,11 @@
+// Main.js
+export default {
 
-
-const RootComponent = {
     data() {
       return {
-        message: 'You loaded this page on ' + new Date().toLocaleString()
+        message: 'You Loaded this page on ' + new Date().toLocaleString()
       }
     },
-    template: `<button> {{ message }}  </button>`
+    template: `<button> {{ message }}  </button> <p> <button-counter></button-counter>`
 }
   
-Vue.createApp(RootComponent).mount('#app')
