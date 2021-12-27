@@ -7,14 +7,10 @@ export default {
         message: 'You Loaded this page on ' + new Date().toLocaleString()
       }
     },
-
     components: {
       'news': News
     },
-
     template: `<div>
-    <button> {{ message }}  </button>
-    <p> <button-counter> </button-counter> </p>
     <p> <news></news> </p>
     </div>
     `,
