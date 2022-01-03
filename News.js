@@ -28,6 +28,11 @@ export default {
 
     template: `
     <div>
+        <router-link to="/">Default</router-link>
+        <router-link to="/about">About</router-link>
+        <router-link to="/news">News</router-link>
+    </div>
+    <div>
         <div v-for="post in news">
             <news-post @change-like="changeILikeForPost"
                 :id="post.id"
