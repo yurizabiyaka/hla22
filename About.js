@@ -32,7 +32,9 @@ const AboutShrinked = {
     <tr> <td> labOne </td> </tr>
     <tr> <td> (c) </td> </tr>
     <tr> <td> YIZ </td> </tr>
-    </table
+    <tr> <td> count: </td> </tr>
+    <tr> <td> {{ this.$store.getters.count }} </td> </tr>
+    </table>
     </div>`
 }
 

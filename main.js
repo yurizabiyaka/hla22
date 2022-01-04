@@ -30,13 +30,7 @@ router.afterEach((to, from) => {
   } 
 })
 
-
 const Main = {
-  data() {
-    return {
-      message: 'You Loaded this page on ' + new Date().toLocaleString()
-    }
-  },
   components: {
     'pane-default-shrinked': DefaultShrinked,
     'pane-about-shrinked':AboutShrinked,
