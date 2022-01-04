@@ -1,7 +1,7 @@
 // News.js
 import NewsPost from './NewsPost.js'
 
-export default {
+const News = {
     data() {
         return {
             news: [
@@ -26,13 +26,17 @@ export default {
         'news-post': NewsPost
     },
 
+    created() {
+        console.log('NEWS created')
+    },
+    beforeUpdate(){
+        console.log('NEWS before update')
+    },
+    beforeUnmount(){
+        console.log('NEWS before unmount')
+    },
     template: `
-    <div>
-        <router-link to="/">Default</router-link>
-        <router-link to="/about">About</router-link>
-        <router-link to="/news">News</router-link>
-    </div>
-    <div>
+    <div class="newsPane">
         <div v-for="post in news">
             <news-post @change-like="changeILikeForPost"
                 :id="post.id"
@@ -44,3 +48,30 @@ export default {
         </div>
     </div>`,
 }
+
+const NewsShrinked = {
+    data() {
+        return {
+            newMessagesCount: 0,
+        }
+    },
+    created() {
+        console.log('NEWS SHRINKED created')
+    },
+    beforeUpdate(){
+        console.log('NEWS SHRINKED before update')
+    },
+    beforeUnmount(){
+        console.log('NEWS SHRINKED before unmount')
+    },
+   template: `
+    <div class="newsPaneShrinked">
+    <router-link to="/news">NEWS</router-link>
+    <table>
+    <tr> <td>New messages:</td> <td>{{ newMessagesCount }}</td> </tr>
+    </table>
+    </div>
+    `
+}
+
+export {News, NewsShrinked}
