@@ -1,25 +1,38 @@
 // Main.js
 import {Default, DefaultShrinked} from './Default.js'
+import {Login, LoginShrinked} from './Login.js'
+import {MyPosts, MyPostsShrinked} from './MyPosts.js'
 import {About, AboutShrinked} from './About.js'
 import {News, NewsShrinked} from './News.js'
 
+import { store } from "./store.js"
 
-// 2. Define some routes
-// Each route should map to a component.
-// We'll talk about nested routes later.
 const routes = [
-  { path: '/', name: 'default', component: Default },
+  { path: '/', name: 'login', component: Login, },
+  { path: '/myposts', name: 'myposts', component: MyPosts , meta: {  requiresAuth: true, } },
+  { path: '/news', name: 'news', component: News, meta: {  requiresAuth: true, }  },
   { path: '/about', name: 'about', component: About },
-  { path: '/news', name: 'news', component: News },
 ]
 
-// 3. Create the router instance and pass the `routes` option
-// You can pass in additional options here, but let's
-// keep it simple for now.
+// TODO: how to set a default route
 const router = VueRouter.createRouter({
-  // 4. Provide the history implementation to use. We are using the hash history for simplicity here.
   history: VueRouter.createWebHashHistory(),
-  routes, // short for `routes: routes`
+  routes,
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(path => path.meta.requiresAuth)) {
+    if (!store.getters.isAuthenticated) {
+      next({
+        name: 'login',
+        query: { redirect: to.fullPath } // добавляется метаинформация куда потом идти
+      })
+    } else {
+      next()
+    }
+  } else {
+    next() // всегда так или иначе нужно вызвать next()!
+  }
 })
 
 router.afterEach((to, from) => {
@@ -32,17 +45,22 @@ router.afterEach((to, from) => {
 
 const Main = {
   components: {
-    'pane-default-shrinked': DefaultShrinked,
-    'pane-about-shrinked':AboutShrinked,
+    'pane-login-shrinked': LoginShrinked,
+    'pane-myposts-shrinked': MyPostsShrinked,
     'pane-news-shrinked': NewsShrinked,
+    'pane-about-shrinked':AboutShrinked,
+  },
+  created() {
+    this.$store.dispatch('loadMyPosts')
+  //  this.$store.dispatch('loadPosts')
   },
   methods: {
     isPaneActive(name) {
-      if (typeof this.$route !== 'undefined') {
+      if (typeof this.$route.name !== 'undefined') {
         return this.$route.name == name
-      } else {
-        return false
       }
+      if (name === 'login') return true;
+      return false
     }
   },
   computed: {
@@ -50,15 +68,17 @@ const Main = {
 
   template: `
     <div class=boyan>
-      <div v-if="isPaneActive('default')" class="activePane"> <router-view></router-view> </div>
-      <div v-else class="paneShrinked"> <pane-default-shrinked></pane-default-shrinked></div>
+      <div v-if="isPaneActive('login')" class="activePane"> <router-view></router-view> </div>
+      <div v-else class="paneShrinked"> <pane-login-shrinked></pane-login-shrinked></div>
       
-      <div v-if="isPaneActive('about')" class="activePane"> <router-view></router-view> </div>
-      <div v-else class="paneShrinked"> <pane-about-shrinked></pane-about-shrinked> </div>
- 
+      <div v-if="isPaneActive('myposts')" class="activePane"> <router-view></router-view> </div>
+      <div v-else class="paneShrinked"> <pane-myposts-shrinked></pane-myposts-shrinked></div>
+  
       <div v-if="isPaneActive('news')" class="activePane"> <router-view></router-view> </div>
       <div v-else class="paneShrinked"> <pane-news-shrinked></pane-news-shrinked> </div>
 
+      <div v-if="isPaneActive('about')" class="activePane"> <router-view></router-view> </div>
+      <div v-else class="paneShrinked"> <pane-about-shrinked></pane-about-shrinked> </div>
     </div>
   `,
 }

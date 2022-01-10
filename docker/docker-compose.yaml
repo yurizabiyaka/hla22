@@ -1,0 +1,14 @@
+version: "3.0"
+services:
+  mariadb:
+    image: arm64v8/mariadb:latest
+    environment:
+      MARIADB_ROOT_PASSWORD: "dbpass"
+      MARIADB_DATABASE: "labonedb"
+      MARIADB_USER: "dbuser"
+      MARIADB_PASSWORD: "dbpass"
+    volumes:
+      - "./labonedb/config:/etc/mysql/conf.d"
+      - "./labonedb/data:/var/lib/mysql"
+    ports:
+      - "3306:3306"
