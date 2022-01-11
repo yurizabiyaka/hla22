@@ -32,9 +32,6 @@ const store = Vuex.createStore( {
         isAuthenticated: (state) => {
             return state.authenticated
         },
-        isLoggedOut: (state) => {
-            return state.logged_out
-        },
         myposts: (state) => {
             return state.myposts
         },
@@ -54,14 +51,11 @@ const store = Vuex.createStore( {
         setAuthenticated(state, authIsGranted) {
             state.authenticated = authIsGranted
         },
-        setLoggedOut(state, is_logged_out) {
-             state.logged_out = is_logged_out
-        },
         setMyPosts(state, allMyPosts) {
             state.myposts = allMyPosts
         },
         clearStore(state) {
-            state.commit('setMyPosts', [])
+            state.myposts = []
         },
         addNewPost(state, myPost) {
             if (!state.myposts) {
@@ -144,7 +138,6 @@ const store = Vuex.createStore( {
                 }, '', (json) => {
                     commit('setUser', {});
                     commit('setAuthenticated', false);
-                    commit('setLoggedOut', true);
                     commit('clearStore');
                 })
             } catch (error) {

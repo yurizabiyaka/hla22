@@ -9,6 +9,7 @@ import { store } from "./store.js"
 
 const routes = [
   { path: '/', name: 'login', component: Login, },
+  { path: '/logout', name: 'logout', redirect: { name: 'login' } }, // this prevents Main to be recreated on logout
   { path: '/myposts', name: 'myposts', component: MyPosts , meta: {  requiresAuth: true, } },
   { path: '/news', name: 'news', component: News, meta: {  requiresAuth: true, }  },
   { path: '/about', name: 'about', component: About },
@@ -51,9 +52,7 @@ const Main = {
     'pane-about-shrinked':AboutShrinked,
   },
   created() {
-    if (!this.$store.getters.isAuthenticated && !this.$store.getters.isLoggedOut) {
-      this.$store.dispatch('loginByCreds')
-    }
+    this.$store.dispatch('loginByCreds')
   },
   methods: {
     isPaneActive(name) {

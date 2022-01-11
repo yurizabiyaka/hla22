@@ -17,10 +17,13 @@ const Login = {
             if (event) {
                 event.preventDefault()
             }
-            this.$store.commit('setAuthenticated', false)
-            this.$store.commit('setLoggedOut', true)
+            this.$store.commit('setAuthenticated', false);
             this.$store.dispatch('logout')
-        }
+            .then(()=> {
+                this.$router.push({ path: 'logout'})
+            })
+            
+       }
     },
     components: {
             'register': Register,
@@ -48,11 +51,23 @@ const LoginShrinked = {
     beforeUnmount(){
         console.log('LOGIN SHRINKED before unmount')
     },
+    methods: {
+        logMeOut(event) {
+            if (event) {
+                event.preventDefault()
+            }
+            this.$store.commit('setAuthenticated', false);
+            this.$store.dispatch('logout')
+            .then(()=> {
+                this.$router.push({ path: 'logout'})
+            })
+        }
+    },
     template: `
     <div class="loginPaneShrinked">
         <table>
             <tr><td> <router-link to="/">LOGIN</router-link> </td></tr>
-            <tr><td> <a href='' @click="this.$store.dispatch('logout')">LOGOUT</a></td></tr>
+            <tr><td> <a href='' @click="logMeOut($event)">LOGOUT</a></td></tr>
             <tr><td>{{ this.$store.getters.isAuthenticated ? "Welcome "+ this.$store.getters.getUser.email  :"Login required"}} </td> </tr>
         </table>
     </div>`
