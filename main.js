@@ -51,6 +51,9 @@ const Main = {
     'pane-about-shrinked':AboutShrinked,
   },
   created() {
+    if (!this.$store.getters.isAuthenticated && !this.$store.getters.isLoggedOut) {
+      this.$store.dispatch('loginByCreds')
+    }
   },
   methods: {
     isPaneActive(name) {

@@ -18,7 +18,7 @@ const store = Vuex.createStore( {
         return {
             user: {},
             authenticated: false,
-            auth_token:'',
+            logged_out: false,
             myposts: [],
             //---------------------
             count: 11,
@@ -26,16 +26,16 @@ const store = Vuex.createStore( {
         }
     },
     getters: {
-        getUser(state) {
+        getUser: (state) => {
             return state.user
         },
-        isAuthenticated(state) {
+        isAuthenticated: (state) => {
             return state.authenticated
         },
-        getAuthToken(state) {
-            return state.auth_token
+        isLoggedOut: (state) => {
+            return state.logged_out
         },
-        myposts(state) {
+        myposts: (state) => {
             return state.myposts
         },
         //-------------------------
@@ -54,11 +54,14 @@ const store = Vuex.createStore( {
         setAuthenticated(state, authIsGranted) {
             state.authenticated = authIsGranted
         },
-        setAuthToken(state, at) {
-            state.auth_token = at
+        setLoggedOut(state, is_logged_out) {
+             state.logged_out = is_logged_out
         },
         setMyPosts(state, allMyPosts) {
             state.myposts = allMyPosts
+        },
+        clearStore(state) {
+            state.commit('setMyPosts', [])
         },
         addNewPost(state, myPost) {
             if (!state.myposts) {
@@ -97,7 +100,7 @@ const store = Vuex.createStore( {
                 }, '', (json) => {
                     commit('setUser', json.user);
                     commit('setAuthenticated', true);
-                    commit('setAuthToken', json.auth_token)
+                    commit('clearStore');
                 })
             } catch (error) {
                 console.log("submitNewUser ", error)
@@ -113,10 +116,39 @@ const store = Vuex.createStore( {
                 }, '', (json) => {
                     commit('setUser', json.user);
                     commit('setAuthenticated', true);
-                    commit('setAuthToken', json.auth_token)
+                    dispatch('loadMyPosts')
                 })
             } catch (error) {
-                console.log("submitNewUser ", error)
+                console.log("signUp ", error)
+            }
+        },
+        async loginByCreds ({commit, dispatch}) {
+            try{
+                return makeApiCallNoReauth("http://localhost:8091/v1/granted/login_by_creds", {
+                    method: "GET",
+                    credentials: 'include',
+                }, '', (json) => {
+                    commit('setUser', json.user);
+                    commit('setAuthenticated', true);
+                    dispatch('loadMyPosts')
+                })
+            } catch (error) {
+                console.log("loginByCreds ", error)
+            }
+        },
+        async logout ({commit, dispatch}) {
+            try{
+                return makeApiCallNoReauth("http://localhost:8091/v1/logout", {
+                    method: "GET",
+                    credentials: 'include',
+                }, '', (json) => {
+                    commit('setUser', {});
+                    commit('setAuthenticated', false);
+                    commit('setLoggedOut', true);
+                    commit('clearStore');
+                })
+            } catch (error) {
+                console.log("logout ", error)
             }
         },
         async loadMyPosts ({ commit, dispatch }) {
@@ -124,7 +156,6 @@ const store = Vuex.createStore( {
                 console.log("loadMyPosts called");
 
                 return makeApiCallNoReauth("http://localhost:8091/v1/granted/myposts?"+ new URLSearchParams({
-                    auth_token: this.getters.getAuthToken,
                 }), {
                     method: 'GET',
                     credentials: 'include'
@@ -134,7 +165,7 @@ const store = Vuex.createStore( {
                 })
             }
             catch (error) {
-                console.log(error);
+                console.log("loadMyPosts", error);
             }
         },
         async submitNewPost ({ commit, dispatch }, newPost) {
@@ -142,7 +173,6 @@ const store = Vuex.createStore( {
                 console.log("submitNewPost called");
 
                 return makeApiCallNoReauth("http://localhost:8091/v1/granted/addpost?"+ new URLSearchParams({
-                    auth_token: this.getters.getAuthToken,
                 }), {
                     method: 'POST',
                     credentials: 'include',
@@ -153,7 +183,7 @@ const store = Vuex.createStore( {
                 })
             }
             catch (error) {
-                console.log(error);
+                console.log("submitNewPost ", error);
             }
         },
         //---------------------------

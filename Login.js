@@ -12,6 +12,16 @@ const Login = {
     beforeUnmount(){
         console.log('LOGIN before unmount')
     },
+    methods: {
+        logMeOut(event) {
+            if (event) {
+                event.preventDefault()
+            }
+            this.$store.commit('setAuthenticated', false)
+            this.$store.commit('setLoggedOut', true)
+            this.$store.dispatch('logout')
+        }
+    },
     components: {
             'register': Register,
             'sign-in': SignIn
@@ -20,7 +30,7 @@ const Login = {
     <div class="loginPane">
     <h1> Login </h1>
     <table width=100%>
-        <tr><td> LOGOUT </td></tr>
+        <tr><td> <a href='' @click="logMeOut($event)">LOGOUT</a></td></tr>
         <tr><td>{{ this.$store.getters.isAuthenticated ? "Welcome "+ this.$store.getters.getUser.email  : "Login required"}} </td> </tr>
         <tr><td> <sign-in /> </td></tr>
         <tr><td> <register /> </td></tr>
@@ -42,7 +52,7 @@ const LoginShrinked = {
     <div class="loginPaneShrinked">
         <table>
             <tr><td> <router-link to="/">LOGIN</router-link> </td></tr>
-            <tr><td> LOGOUT </td></tr>
+            <tr><td> <a href='' @click="this.$store.dispatch('logout')">LOGOUT</a></td></tr>
             <tr><td>{{ this.$store.getters.isAuthenticated ? "Welcome "+ this.$store.getters.getUser.email  :"Login required"}} </td> </tr>
         </table>
     </div>`

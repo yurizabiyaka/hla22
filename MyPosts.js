@@ -9,7 +9,6 @@ const MyPosts = {
     },
     created() {
         console.log('MYPOSTS created')
-        this.$store.dispatch('loadMyPosts')
     },
     // beforeUpdate(){
     //     console.log('MYPOSTS before update')
@@ -27,8 +26,12 @@ const MyPosts = {
             e.preventDefault()
             if (this.newText.length > 0) {
                 this.$store.dispatch('submitNewPost', { text: this.newText })
-                .then(response => {
-                    this.newText = ""
+                .then(responseBody => {
+                    if (responseBody.failed) {
+                        alert(responseBody.error_message)
+                    } else {
+                        this.newText = ""
+                    }
                 })
                 .catch(function (error) {
                     console.error(error);

@@ -26,7 +26,8 @@ func LoadPosts(ctx context.Context, userID uuid.UUID) ([]app_model.UserPost, err
 	rows, err := lab_dbconnect.Conn().QueryContext(ctx,
 		"SELECT UuidFromBin(id), UuidFromBin(user_id), text, date_time, likes_count, comments_count "+
 			"FROM posts "+
-			"WHERE user_id = UuidToBin(?)", userID)
+			"WHERE user_id = UuidToBin(?) "+
+			"ORDER BY date_time DESC", userID)
 	if err != nil {
 		return nil, err
 	}

@@ -10,7 +10,11 @@ require (
 
 require (
 	github.com/ajg/form v1.5.1 // indirect
+	github.com/aymerick/douceur v0.2.0 // indirect
+	github.com/chris-ramon/douceur v0.2.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/gorilla/css v1.0.0 // indirect
+	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/imkira/go-interpol v1.1.0 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
@@ -33,16 +37,16 @@ require (
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/iris-contrib/blackfriday v2.0.0+incompatible // indirect
 	github.com/iris-contrib/go.uuid v2.0.0+incompatible // indirect
-	github.com/iris-contrib/jade v1.1.3 // indirect
+	github.com/iris-contrib/jade v1.1.4 // indirect
 	github.com/iris-contrib/pongo2 v0.0.1 // indirect
-	github.com/iris-contrib/schema v0.0.1 // indirect
-	github.com/json-iterator/go v1.1.9 // indirect
-	github.com/kataras/golog v0.0.10 // indirect
+	github.com/iris-contrib/schema v0.0.2 // indirect
+	github.com/json-iterator/go v1.1.10 // indirect
+	github.com/kataras/golog v0.0.18 // indirect
 	github.com/kataras/iris/v12 v12.1.8
-	github.com/kataras/pio v0.0.2 // indirect
+	github.com/kataras/pio v0.0.8 // indirect
 	github.com/kataras/sitemap v0.0.5 // indirect
 	github.com/klauspost/compress v1.13.4 // indirect
-	github.com/microcosm-cc/bluemonday v1.0.2 // indirect
+	github.com/microcosm-cc/bluemonday v1.0.3 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742 // indirect
 	github.com/ryanuber/columnize v2.1.0+incompatible // indirect
@@ -54,6 +58,6 @@ require (
 	golang.org/x/net v0.0.0-20210510120150-4163338589ed // indirect
 	golang.org/x/sys v0.0.0-20210514084401-e8d321eab015 // indirect
 	golang.org/x/text v0.3.6 // indirect
-	gopkg.in/ini.v1 v1.51.1 // indirect
+	gopkg.in/ini.v1 v1.57.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )

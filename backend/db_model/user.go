@@ -7,6 +7,8 @@ import (
 
 	"github.com/yurizabiyaka/hla22/lab_one_backend/app_model"
 	lab_dbconnect "github.com/yurizabiyaka/hla22/lab_one_backend/lab_dbconnect"
+
+	"github.com/google/uuid"
 )
 
 func GetUserByEmail(ctx context.Context, email string) (*app_model.User, error) {
@@ -60,9 +62,7 @@ func CreateUser(ctx context.Context, au app_model.User) error {
 	return nil
 }
 
-func GetUserByID(ctx context.Context) (*app_model.User, error) {
-
-	userID := ctx.Value(app_model.USERID_CTX_KEY)
+func GetUserByID(ctx context.Context, userID uuid.UUID) (*app_model.User, error) {
 
 	row := lab_dbconnect.Conn().QueryRowContext(ctx,
 		"SELECT UuidFromBin(id), email, hash, first_name, surname, birth_year, sex, interests, city, registration_date "+
