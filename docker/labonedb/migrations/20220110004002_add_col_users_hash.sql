@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-ALTER TABLE users ADD hash VARCHAR(64) NOT NULL;
+ALTER TABLE users ADD hash VARCHAR(60) NOT NULL;
 -- +goose StatementEnd
 
 -- +goose Down

@@ -1,7 +1,24 @@
+async function makeApiCallNoReauth(url, fetchOptions, tag, okCallback) {
+    const response = await fetch(url, fetchOptions);
+    const json = await response.json();
+    if (json.failed) {
+        console.log(json.error_code, json.error_message);
+    } else {
+        if (tag === ''){ 
+            okCallback(json)
+        } else {
+            okCallback(json[tag]);
+        }
+    }
+    return json;
+}
+
 const store = Vuex.createStore( {
     state() {
         return {
+            user: {},
             authenticated: false,
+            auth_token:'',
             myposts: [],
             //---------------------
             count: 11,
@@ -9,8 +26,14 @@ const store = Vuex.createStore( {
         }
     },
     getters: {
+        getUser(state) {
+            return state.user
+        },
         isAuthenticated(state) {
             return state.authenticated
+        },
+        getAuthToken(state) {
+            return state.auth_token
         },
         myposts(state) {
             return state.myposts
@@ -24,14 +47,28 @@ const store = Vuex.createStore( {
         },
     },
     mutations: {
+        setUser(state, user) {
+            state.isAuthenticated = true
+            state.user = user
+        },
         setAuthenticated(state, authIsGranted) {
             state.authenticated = authIsGranted
+        },
+        setAuthToken(state, at) {
+            state.auth_token = at
         },
         setMyPosts(state, allMyPosts) {
             state.myposts = allMyPosts
         },
         addNewPost(state, myPost) {
-            state.myposts.unshift(myPost)
+            if (!state.myposts) {
+                state.myposts = []
+            }
+            if (state.myposts.length === 0) {
+                state.myposts.push(myPost)
+            } else {
+                state.myposts.unshift(myPost)
+            }
         },
         //------------------------------
         increment (state, n) {
@@ -50,57 +87,51 @@ const store = Vuex.createStore( {
         }
     },
     actions: {
-        async login({ commit }) {
-            try {
-                return fetch("http://localhost:8091/v1/login", {
-                    method: 'GET',
-                    credentials: 'include'
+        async submitNewUser({ commit, dispatch }, newUser) {
+            try{
+                return makeApiCallNoReauth("http://localhost:8091/v1/new_user", {
+                    method: "PUT",
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newUser)
+                }, '', (json) => {
+                    commit('setUser', json.user);
+                    commit('setAuthenticated', true);
+                    commit('setAuthToken', json.auth_token)
                 })
-                .then((response)=>{
-                    return response.json();
-                }).then((json)=>{
-                    if (json.failed) {
-                        console.log(json.error_code, json.error_message); 
-                    } else {
-                        commit('setAuthenticated', json.authenticated)
-                        console.log("AUTH STATUS:", json); 
-                    }
-                    return json
-                })
+            } catch (error) {
+                console.log("submitNewUser ", error)
             }
-            catch (error) {
-                console.log(error);
+        },
+        async signUp({ commit, dispatch }, userInfo) {
+            try{
+                return makeApiCallNoReauth("http://localhost:8091/v1/login", {
+                    method: "POST",
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userInfo)
+                }, '', (json) => {
+                    commit('setUser', json.user);
+                    commit('setAuthenticated', true);
+                    commit('setAuthToken', json.auth_token)
+                })
+            } catch (error) {
+                console.log("submitNewUser ", error)
             }
         },
         async loadMyPosts ({ commit, dispatch }) {
             try {
-                var fetchOptions = {
+                console.log("loadMyPosts called");
+
+                return makeApiCallNoReauth("http://localhost:8091/v1/granted/myposts?"+ new URLSearchParams({
+                    auth_token: this.getters.getAuthToken,
+                }), {
                     method: 'GET',
                     credentials: 'include'
-                }
-
-                // load-reauth
-                var response = await  fetch("http://localhost:8091/v1/granted/myposts", fetchOptions)
-                if (response.status === 403) {
-                    const authRes = await dispatch('login')
-                    if (authRes.failed) {
-                        return response
-                    } else { // retry add post
-                        response = await fetch("http://localhost:8091/v1/granted/myposts", fetchOptions);
-                    }
-                }
-                if (!response.ok) {
-                    return false
-                }
-
-                // commit data
-                const res = await response.json();
-                if ( res.failed ) {
-                    console.log(res.error_code, res.error_message); 
-                } else {
-                    commit('setMyPosts', res.my_posts)
-                }
-                return res
+                }, '', (json) => {
+                    console.log("loadMyPosts json: ", json);
+                    commit('setMyPosts', json.my_posts)
+                })
             }
             catch (error) {
                 console.log(error);
@@ -108,55 +139,24 @@ const store = Vuex.createStore( {
         },
         async submitNewPost ({ commit, dispatch }, newPost) {
             try {
-                var fetchOptions = {
+                console.log("submitNewPost called");
+
+                return makeApiCallNoReauth("http://localhost:8091/v1/granted/addpost?"+ new URLSearchParams({
+                    auth_token: this.getters.getAuthToken,
+                }), {
                     method: 'POST',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newPost)
-                }
-
-                // add-reauth
-                var response = await fetch("http://localhost:8091/v1/granted/addpost", fetchOptions);
-                if (response.status === 403) {
-                    const authRes = await dispatch('login')
-                    if (authRes.failed) {
-                        return response
-                    } else { // retry add post
-                        response = await fetch("http://localhost:8091/v1/granted/addpost", fetchOptions);
-                    }
-                }
-                if (!response.ok) {
-                    return false
-                }
-
-                // commit data
-                const res = await response.json();
-                if ( res.failed ) {
-                    console.log(res.error_code, res.error_message); 
-                } else {
-                    commit('addNewPost', res.new_post)
-                }
-                return res
-            } catch (error) {
-                console.log(error);
-            }
-        },
-        async submitNewUser({ commit, dispatch }, newPost) {
-        },
-        //---------------------------
-        async loadPosts ({ commit }) {
-            try {
-                fetch("http://localhost:8091/posts")
-                .then((response)=>{
-                    return response.json();
-                }).then((json)=>{
-                    commit('setNews', json)
+                }, 'new_post', (new_post) => {
+                    commit('addNewPost', new_post)
                 })
             }
             catch (error) {
                 console.log(error);
             }
-        }
+        },
+        //---------------------------
     },
 });
 

@@ -25,7 +25,7 @@ type User struct {
 	Surname         string    `json:"surname"`
 	Email           string    `json:"email"`
 	Password        string    `json:"password"`
-	Hash            string    `json:"-"`
+	Hash            []byte    `json:"-"`
 	BirthYear       time.Time `json:"-"`
 	Age             uint8     `json:"age"`
 	Sex             string    `json:"sex"`
@@ -40,15 +40,15 @@ func UserFront2App(frontUser User) (appUser User, err error) {
 	appUser.Surname = frontUser.Surname
 	appUser.Email = frontUser.Email
 
-	if len(appUser.Password) == 0 {
+	if len(frontUser.Password) == 0 {
 		return appUser, fmt.Errorf("password not set")
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(appUser.Password), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(frontUser.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return appUser, err
 	}
-	appUser.Hash = string(hash)
+	appUser.Hash = hash
 
 	// calc birth year
 	appUser.BirthYear = time.Date(time.Now().Year()-int(frontUser.Age), 0, 0, 0, 0, 0, 0, time.Local)

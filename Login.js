@@ -1,16 +1,10 @@
 // Login.js
 import Register from "./Register.js"
+import SignIn from "./SignIn.js"
 
 const Login = {
     created() {
         console.log('LOGIN created')
-        // если есть токен и имя пользователя - то релогиниться с ним:
-        this.$store.dispatch('login')
-        .then(() => {
-            if (this.$route.query && this.$route.query.redirect)
-                this.$router.push(this.$route.query.redirect)
-        })
-        console.log(this.$route.query)
     },
     beforeUpdate(){
         console.log('LOGIN before update')
@@ -19,14 +13,16 @@ const Login = {
         console.log('LOGIN before unmount')
     },
     components: {
-            'register': Register
+            'register': Register,
+            'sign-in': SignIn
     },
     template: `
     <div class="loginPane">
     <h1> Login </h1>
-    <table>
+    <table width=100%>
         <tr><td> LOGOUT </td></tr>
-        <tr><td>{{ this.$store.getters.isAuthenticated ? "Authenticated" : "Login required"}} </td> </tr>
+        <tr><td>{{ this.$store.getters.isAuthenticated ? "Welcome "+ this.$store.getters.getUser.email  : "Login required"}} </td> </tr>
+        <tr><td> <sign-in /> </td></tr>
         <tr><td> <register /> </td></tr>
     </table>
     </div>`
@@ -47,7 +43,7 @@ const LoginShrinked = {
         <table>
             <tr><td> <router-link to="/">LOGIN</router-link> </td></tr>
             <tr><td> LOGOUT </td></tr>
-            <tr><td>{{ this.$store.getters.isAuthenticated ? "Authenticated" : "Login required"}} </td> </tr>
+            <tr><td>{{ this.$store.getters.isAuthenticated ? "Welcome "+ this.$store.getters.getUser.email  :"Login required"}} </td> </tr>
         </table>
     </div>`
 }

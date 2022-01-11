@@ -31,7 +31,7 @@ const MyPosts = {
                     this.newText = ""
                 })
                 .catch(function (error) {
-                    console.error(error.response);
+                    console.error(error);
                 });
             }
         },
@@ -63,20 +63,11 @@ const MyPosts = {
 }
 
 const MyPostsShrinked = {
-    // created() {
-    //     console.log('MYPOSTS SHRINKED created')
-    // },
-    // beforeUpdate(){
-    //     console.log('MYPOSTS SHRINKED before update')
-    // },
-    // beforeUnmount(){
-    //     console.log('MYPOSTS SHRINKED before unmount')
-    // },
     created() {
     },
     computed: {
         totalMyPosts() {
-            return this.$store.getters.myposts.length
+            return this.$store.getters.myposts && this.$store.getters.myposts.length || 0
         }
     },
     template: `

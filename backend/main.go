@@ -1,7 +1,11 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/yurizabiyaka/hla22/lab_one_backend/app_model"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/lab_error"
+	"github.com/yurizabiyaka/hla22/lab_one_backend/logger"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/login"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/user_posts"
 
@@ -15,24 +19,56 @@ func secret(ctx iris.Context) {
 	ctx.WriteString("The cake is a lie!")
 }
 
+func getAuthToken(ctx iris.Context) (string, bool) {
+	// TODO get it from headers or cookies
+	token := ctx.URLParam(app_model.RESPONSE_KEY_AUTHTOKEN)
+	return token, len(token) > 0
+}
+
 func checkAuth(ctx iris.Context) {
 	// Skip OPTIONS preflight requests
 	if ctx.Method() == "OPTIONS" {
+		logger.Log().Info(fmt.Sprintf("checkAuth: granted OPTIONS request to %s %s", ctx.Request().Method, ctx.RequestPath(true)))
+
 		ctx.Next()
 		return
 	}
+
 	// Check if user is authenticated
-	if auth, _ := sessions.Get(ctx).GetBoolean("authenticated"); !auth {
-		ctx.StatusCode(iris.StatusForbidden)
-		ctx.JSON(&lab_error.LabError{
-			Failed:       true,
-			ErrorCode:    -1,
-			ErrorMessage: ctx.GetCurrentRoute().Tmpl().Src + ": not authenticated",
-		})
-		ctx.EndRequest()
-		return
+	sess := sessions.Get(ctx)
+
+	switch isAuthenticated := sess.Get(app_model.AUTHENTICATED_CTX_KEY).(type) {
+	case bool:
+		if !isAuthenticated { // not in sessions, but maybe backend has been restarted since
+			if userAuthToken, present := getAuthToken(ctx); present {
+				// TODO load token's userID from db
+				// (load token with this id AND last_time is not longer than AND status active ) and uptate it's last_time
+				isAuthenticated = true
+				userID := "ABC"
+				sess.Set(app_model.USERID_CTX_KEY, userID)
+
+				logger.Log().Info(fmt.Sprintf("checkAuth: token from db is valid: %s userID is: %s", userAuthToken, userID))
+			}
+		}
+		if isAuthenticated {
+			if userId, ok := sess.Get(app_model.USERID_CTX_KEY).(string); ok {
+				logger.Log().Info(fmt.Sprintf("checkAuth: authenticated user %s for request %s %s", userId, ctx.Request().Method, ctx.RequestPath(true)))
+				ctx.Next()
+				return
+			}
+		}
+	default:
 	}
-	ctx.Next()
+
+	logger.Log().Info(fmt.Sprintf("checkAuth: not auth %s %s", ctx.Request().Method, ctx.RequestPath(true)))
+
+	ctx.StatusCode(iris.StatusForbidden)
+	ctx.JSON(&lab_error.LabError{
+		Failed:       true,
+		ErrorCode:    -1,
+		ErrorMessage: ctx.GetCurrentRoute().Tmpl().Src + ": not authenticated",
+	})
+	ctx.EndRequest()
 }
 
 func addAccessControlAllowOrigin(ctx iris.Context) {
@@ -63,9 +99,11 @@ func main() {
 	v1api := app.Party("/v1")
 	{
 		// без аутентификации
-		v1api.Get("/login", login.Login)
+		v1api.Options("/login", optionsStub)
+		v1api.Post("/login", login.Login)
 		v1api.Get("/logout", login.Logout)
-		v1api.Post("/new_user", login.NewUser)
+		v1api.Options("/new_user", optionsStub)
+		v1api.Put("/new_user", login.NewUser)
 
 		// с аутентификацией
 		v1granted := v1api.Party("/granted")

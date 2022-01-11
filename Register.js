@@ -1,14 +1,5 @@
 // Register.js
 export default {
-    // created() {
-    //     console.log('REGISTER created')
-    // },
-    // beforeUpdate(){
-    //     console.log('REGISTER before update')
-    // },
-    // beforeUnmount(){
-    //     console.log('REGISTER before unmount')
-    // },
     data () {
         return {
           first_name : "",
@@ -16,17 +7,32 @@ export default {
           email : "",
           password : "",
           password_confirmation : "",
-          age: "",
+          age: 0,
           sex: "",
           interests: "",
           city: "",
         }
     },
-      methods: {
+    methods: {
         handleSubmit(e) {
           e.preventDefault()
     
           if (this.password === this.password_confirmation && this.password.length > 0) {
+              this.$store.dispatch('submitNewUser', {
+                  first_name: this.first_name,
+                  surname: this.surname,
+                  email: this.email,
+                  password: this.password,
+                  age: this.age,
+                  interests: this.interests,
+                  city: this.city
+              }).then(json => {
+                  if (json.failed) {
+                    this.password = ""
+                    this.passwordConfirm = ""
+                    alert(json.error_message)
+                  }
+              })
           } else {
             this.password = ""
             this.passwordConfirm = ""
@@ -34,10 +40,10 @@ export default {
             return alert("Passwords do not match")
           }
         }
-      },
+    },
     template: `
     <div class="registerPane">
-        <h1> REGISTER </h1>
+        <h4> REGISTER </h4>
         <form>
             <div>
                 <input id="first_name" type="text" v-model="first_name" required autofocus placeholder="First Name" />
@@ -62,7 +68,7 @@ export default {
                 </select>
             </div>
             <div>
-                <input id="age" type="text" v-model="age" required placeholder="Age" />
+                <input id="age" type="number" v-model="age" required placeholder="Age" />
             </div>
             <div>
                 <input id="city" type="text" v-model="city" required placeholder="City" />

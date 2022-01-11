@@ -11,22 +11,69 @@ import (
 	"github.com/google/uuid"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/sessions"
+	"golang.org/x/crypto/bcrypt"
 )
+
+type LoginInfo struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
 
 func Login(ctx iris.Context) {
 	session := sessions.Get(ctx)
 
-	// Authentication goes here
-	// ...
+	loginInfo := LoginInfo{}
+	err := ctx.ReadJSON(&loginInfo)
+	if err != nil {
+		ctx.JSON(&lab_error.LabError{
+			Failed:       true,
+			ErrorCode:    -2, // any deserialization error
+			ErrorMessage: err.Error(),
+		})
+		return
+	}
 
-	//err := bcrypt.CompareHashAndPassword(hashedPassword, password)
+	appUser, err := db_model.GetUserByEmail(ctx.Request().Context(), loginInfo.Email)
+	if err != nil {
+		ctx.JSON(&lab_error.LabError{
+			Failed:       true,
+			ErrorCode:    -10, // any db error
+			ErrorMessage: err.Error(),
+		})
+		return
+	}
+
+	if appUser == nil {
+		ctx.JSON(&lab_error.LabError{
+			Failed:       true,
+			ErrorCode:    -4, // user not found
+			ErrorMessage: "user not found",
+		})
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(appUser.Hash), []byte(loginInfo.Password))
+	if err != nil {
+		ctx.JSON(&lab_error.LabError{
+			Failed:       true,
+			ErrorCode:    -4, // passwords not match, let it be -4 also
+			ErrorMessage: "user not found",
+		})
+		return
+	}
 
 	// Set user as authenticated
-	session.Set(app_model.AUTH_CTX_KEY, true)
+	session.Set(app_model.USERID_CTX_KEY, appUser.ID.String())
+	session.Set(app_model.AUTHENTICATED_CTX_KEY, true)
+	authToken := getUserAuthToken()
+	session.Set(app_model.AUTHTOKEN_CTX_KEY, authToken)
+
 	ctx.JSON(&struct {
-		Authenticated bool `json:"authenticated"`
+		User      app_model.User `json:"user"`
+		AuthToken string         `json:"auth_token"`
 	}{
-		Authenticated: true,
+		User:      *appUser,
+		AuthToken: authToken,
 	})
 }
 
@@ -84,8 +131,10 @@ func NewUser(ctx iris.Context) {
 	appUser.RegistationDate = time.Now()
 
 	session := sessions.Get(ctx)
-	session.Set(app_model.USERID_CTX_KEY, appUser.ID)
-	session.Set(app_model.AUTH_CTX_KEY, true)
+	session.Set(app_model.USERID_CTX_KEY, appUser.ID.String())
+	session.Set(app_model.AUTHENTICATED_CTX_KEY, true)
+	authToken := getUserAuthToken()
+	session.Set(app_model.AUTHTOKEN_CTX_KEY, authToken)
 
 	localCtx := context.WithValue(ctx.Request().Context(), app_model.USERID_CTX_KEY, appUser.ID)
 	err = db_model.CreateUser(localCtx, appUser)
@@ -99,8 +148,14 @@ func NewUser(ctx iris.Context) {
 	}
 
 	ctx.JSON(&struct {
-		User app_model.User `json:"user"`
+		User      app_model.User `json:"user"`
+		AuthToken string         `json:"auth_token"`
 	}{
-		User: appUser,
+		User:      appUser,
+		AuthToken: authToken,
 	})
+}
+
+func getUserAuthToken() string {
+	return uuid.New().String()
 }

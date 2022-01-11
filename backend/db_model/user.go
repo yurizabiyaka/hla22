@@ -11,7 +11,7 @@ import (
 
 func GetUserByEmail(ctx context.Context, email string) (*app_model.User, error) {
 	row := lab_dbconnect.Conn().QueryRowContext(ctx,
-		"SELECT UuidFromBin(id), email, first_name, surname, birth_year, sex, interests, city, registration_date "+
+		"SELECT UuidFromBin(id), email, hash, first_name, surname, birth_year, sex, interests, city, registration_date "+
 			"FROM users "+
 			"WHERE email = ?", email)
 
@@ -23,7 +23,7 @@ func scanUserRow(row *sql.Row) (*app_model.User, error) {
 	var birthYearBromDb uint
 	var regDateFromDb string
 
-	err := row.Scan(&aUser.ID, &aUser.Email, &aUser.FirstName, &aUser.Surname, &birthYearBromDb, &aUser.Sex, &aUser.Interests, &aUser.City, &regDateFromDb)
+	err := row.Scan(&aUser.ID, &aUser.Email, &aUser.Hash, &aUser.FirstName, &aUser.Surname, &birthYearBromDb, &aUser.Sex, &aUser.Interests, &aUser.City, &regDateFromDb)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -33,6 +33,7 @@ func scanUserRow(row *sql.Row) (*app_model.User, error) {
 	}
 
 	// convert db into app
+	aUser.Age = uint8(time.Now().Year() - int(birthYearBromDb))
 	aUser.BirthYear = time.Date(int(birthYearBromDb), 0, 0, 0, 0, 0, 0, time.Local)
 	aUser.RegistationDate, err = time.Parse(lab_dbconnect.DateFormat, regDateFromDb)
 	if err != nil {
@@ -64,7 +65,7 @@ func GetUserByID(ctx context.Context) (*app_model.User, error) {
 	userID := ctx.Value(app_model.USERID_CTX_KEY)
 
 	row := lab_dbconnect.Conn().QueryRowContext(ctx,
-		"SELECT UuidFromBin(id), email, first_name, surname, birth_year, sex, interests, city, registration_date "+
+		"SELECT UuidFromBin(id), email, hash, first_name, surname, birth_year, sex, interests, city, registration_date "+
 			"FROM users "+
 			"WHERE id = UuidToBin(?)", userID)
 

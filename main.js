@@ -51,8 +51,6 @@ const Main = {
     'pane-about-shrinked':AboutShrinked,
   },
   created() {
-    this.$store.dispatch('loadMyPosts')
-  //  this.$store.dispatch('loadPosts')
   },
   methods: {
     isPaneActive(name) {

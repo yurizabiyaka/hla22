@@ -6,10 +6,11 @@ import (
 
 	"github.com/yurizabiyaka/hla22/lab_one_backend/app_model"
 	lab_dbconnect "github.com/yurizabiyaka/hla22/lab_one_backend/lab_dbconnect"
+
+	"github.com/google/uuid"
 )
 
-func CreatePost(ctx context.Context, up app_model.UserPost) error {
-	userID := ctx.Value(app_model.USERID_CTX_KEY)
+func CreatePost(ctx context.Context, userID uuid.UUID, up app_model.UserPost) error {
 	dateStr := up.Date.Format(lab_dbconnect.DateFormat)
 
 	_, err := lab_dbconnect.Conn().ExecContext(ctx,
@@ -21,9 +22,7 @@ func CreatePost(ctx context.Context, up app_model.UserPost) error {
 	return nil
 }
 
-func LoadPosts(ctx context.Context) ([]app_model.UserPost, error) {
-	userID := ctx.Value(app_model.USERID_CTX_KEY)
-
+func LoadPosts(ctx context.Context, userID uuid.UUID) ([]app_model.UserPost, error) {
 	rows, err := lab_dbconnect.Conn().QueryContext(ctx,
 		"SELECT UuidFromBin(id), UuidFromBin(user_id), text, date_time, likes_count, comments_count "+
 			"FROM posts "+
