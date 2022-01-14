@@ -10,11 +10,6 @@ import (
 )
 
 const (
-	UsMale = iota
-	UsFemale
-)
-
-const (
 	USMALE   = "male"
 	USFEMALE = "female"
 )
@@ -32,6 +27,7 @@ type User struct {
 	Interests       string    `json:"interests"`
 	City            string    `json:"city"`
 	RegistationDate time.Time `json:"-"`
+	Indx            uint64    `json:"-"`
 }
 
 // UserFront2App converts user entity: front sends Age, which should be converted into BirthYear
@@ -61,4 +57,53 @@ func UserFront2App(frontUser User) (appUser User, err error) {
 	appUser.City = frontUser.City
 
 	return appUser, nil
+}
+
+type FriendshipState string
+
+const (
+	FSNONE      FriendshipState = "none"
+	FSREQUESTED FriendshipState = "requested"
+	FSACCEPTED  FriendshipState = "accepted"
+	FSDECLINED  FriendshipState = "declined"
+	FSITSME     FriendshipState = "itsme"
+)
+
+type UserProfile struct {
+	Index        uint64          `json:"index"`
+	ID           uuid.UUID       `json:"id"`
+	FirstName    string          `json:"first_name"`
+	Surname      string          `json:"surname"`
+	BirthYear    time.Time       `json:"-"`
+	Age          uint8           `json:"age"`
+	Sex          string          `json:"sex"`
+	Interests    string          `json:"interests"`
+	City         string          `json:"city"`
+	Friendship   FriendshipState `json:"friendship"`
+	FriendshipDb string          `json:"-"`
+}
+
+// UserProfileApp2Front converts age
+func UserProfileApp2Front(app UserProfile) (front UserProfile) {
+	front = app
+	front.Age = uint8(time.Now().Year() - int(app.BirthYear.Year()))
+
+	return
+}
+
+func UserApp2UserProfileApp(user User) UserProfile {
+	profile := UserProfile{
+		Index:        user.Indx,
+		ID:           user.ID,
+		FirstName:    user.FirstName,
+		Surname:      user.Surname,
+		BirthYear:    user.BirthYear,
+		Age:          user.Age,
+		Sex:          user.Sex,
+		Interests:    user.Interests,
+		City:         user.City,
+		Friendship:   FSNONE,
+		FriendshipDb: "",
+	}
+	return profile
 }

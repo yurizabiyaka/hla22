@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/yurizabiyaka/hla22/lab_one_backend/authentication"
+	"github.com/yurizabiyaka/hla22/lab_one_backend/friends"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/login"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/user_posts"
 
@@ -37,7 +38,9 @@ func main() {
 		// без аутентификации
 		v1api.Options("/login", authentication.OptionsStub)
 		v1api.Post("/login", login.Login)
+
 		v1api.Get("/logout", login.Logout)
+
 		v1api.Options("/new_user", authentication.OptionsStub)
 		v1api.Put("/new_user", login.NewUser)
 
@@ -46,9 +49,19 @@ func main() {
 		v1granted.Use(authentication.CheckAuth)
 		{
 			v1granted.Get("/login_by_creds", login.ByCreds)
+
 			v1granted.Get("/myposts", user_posts.ListMyPosts)
+
 			v1granted.Options("/addpost", authentication.OptionsStub)
 			v1granted.Post("/addpost", user_posts.AddPost)
+
+			v1granted.Get("/get_profiles", friends.ListPublicProfiles)
+
+			v1granted.Options("/new_friend_request", authentication.OptionsStub)
+			v1granted.Put("/new_friend_request", friends.NewFriendRequest)
+
+			v1granted.Options("/myfriends", authentication.OptionsStub)
+			v1granted.Get("/myfriends", friends.ListMyFriends)
 		}
 	}
 

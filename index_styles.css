@@ -78,6 +78,20 @@ textarea#newtext {
     background-color: white;
 }
 
+/* ----------- USERPROFILE ------------- */
+
+.user_profile_row_1 {
+    background-color: lightskyblue;
+}
+
+.user_profile_row_2 {
+    background-color: wheat;
+}
+
+.user_profile_emptyrow {
+    background-color: whitesmoke;
+}
+
 /* ----------- NEWS ----------------- */
 
 .newsPane {

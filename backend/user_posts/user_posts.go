@@ -2,6 +2,7 @@ package user_posts
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/yurizabiyaka/hla22/lab_one_backend/app_model"
@@ -26,6 +27,8 @@ func ListMyPosts(ctx iris.Context) {
 			})
 			return
 		}
+
+		logger.Log().Info(fmt.Sprintf("ListMyPosts: user %s", userId))
 
 		ctx.JSON(&struct {
 			MyPosts []app_model.UserPost `json:"my_posts"`
@@ -59,6 +62,8 @@ func AddPost(ctx iris.Context) {
 		newPost := NewUserPost{}
 		err := ctx.ReadJSON(&newPost)
 		if err != nil {
+			err := fmt.Errorf("AddPost: failed to read json: %w", err)
+			logger.Log().Error(err.Error())
 			ctx.JSON(&lab_error.LabError{
 				Failed:       true,
 				ErrorCode:    -2, // any deserialization error
@@ -88,6 +93,8 @@ func AddPost(ctx iris.Context) {
 			})
 			return
 		}
+
+		logger.Log().Info(fmt.Sprintf("AddPost: user %s", userId))
 
 		ctx.JSON(&struct {
 			NewPost app_model.UserPost `json:"new_post"`

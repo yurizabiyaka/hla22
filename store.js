@@ -4,7 +4,7 @@ async function makeApiCallNoReauth(url, fetchOptions, tag, okCallback) {
     if (json.failed) {
         console.log(json.error_code, json.error_message);
     } else {
-        if (tag === ''){ 
+        if (tag === '') {
             okCallback(json)
         } else {
             okCallback(json[tag]);
@@ -13,13 +13,32 @@ async function makeApiCallNoReauth(url, fetchOptions, tag, okCallback) {
     return json;
 }
 
-const store = Vuex.createStore( {
+function myfriendsDefaults() {
+    return {
+        total: 0,
+        from: 0,
+        quantity: 100,
+        profiles: []
+    }
+}
+
+function lastSearchProfilesResultsDefaults() {
+    return {
+        from: 0,
+        quantity: 100,
+        results: []
+    }
+}
+
+const store = Vuex.createStore({
     state() {
         return {
             user: {},
             authenticated: false,
             logged_out: false,
             myposts: [],
+            lastSearchProfilesResults: lastSearchProfilesResultsDefaults(),
+            myfriends: myfriendsDefaults(),
             //---------------------
             count: 11,
             news: []
@@ -34,6 +53,12 @@ const store = Vuex.createStore( {
         },
         myposts: (state) => {
             return state.myposts
+        },
+        lastSearchProfilesResults: (state) => {
+            return state.lastSearchProfilesResults
+        },
+        lastGetFriendsResults: (state) => {
+            return state.myfriends
         },
         //-------------------------
         count(state) {
@@ -55,7 +80,10 @@ const store = Vuex.createStore( {
             state.myposts = allMyPosts
         },
         clearStore(state) {
-            state.myposts = []
+            state.myposts = [];
+            // TODO make init function
+            state.lastSearchProfilesResults = lastSearchProfilesResultsDefaults();
+            state.myfriends = myfriendsDefaults();
         },
         addNewPost(state, myPost) {
             if (!state.myposts) {
@@ -67,13 +95,40 @@ const store = Vuex.createStore( {
                 state.myposts.unshift(myPost)
             }
         },
+        setLastSearchProfilesResults(state, lastResults) {
+            state.lastSearchProfilesResults = lastResults
+        },
+        updateProfileInLastSearchProfilesResults(state, profile) {
+            const idx = state.lastSearchProfilesResults.results.findIndex((currElement) => {
+                return currElement.id === profile.id
+            })
+            if (idx>0) {
+                state.lastSearchProfilesResults.results[idx]=profile
+            }
+        },
+        setLastGetFriendsResults(state, lastResults) {
+            state.myfriends = lastResults
+        },
+        addFriendProfile(state, profile) {
+            state.myfriends.total++
+            /*
+            if (!state.myfriends.results) {
+                state.myfriends.results = []
+            }
+            if (state.myfriends.length === 0) {
+                state.myfriends.push(profile)
+            } else {
+                state.myfriends.unshift(profile)
+            }
+            */
+        },
         //------------------------------
-        increment (state, n) {
+        increment(state, n) {
             state.count += n
         },
         changeILikeForPostID(state, postID) {
-            const postIdx = state.news.findIndex(function(element, index, array){
-                return element.id===postID
+            const postIdx = state.news.findIndex(function (element, index, array) {
+                return element.id === postID
             })
             if (postIdx >= 0) {
                 state.news[postIdx].iLike = state.news[postIdx].iLike ? false : true
@@ -85,29 +140,30 @@ const store = Vuex.createStore( {
     },
     actions: {
         async submitNewUser({ commit, dispatch }, newUser) {
-            try{
+            try {
                 return makeApiCallNoReauth("http://localhost:8091/v1/new_user", {
                     method: "PUT",
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newUser)
                 }, '', (json) => {
+                    commit('clearStore');
                     commit('setUser', json.user);
                     commit('setAuthenticated', true);
-                    commit('clearStore');
                 })
             } catch (error) {
                 console.log("submitNewUser ", error)
             }
         },
         async signUp({ commit, dispatch }, userInfo) {
-            try{
+            try {
                 return makeApiCallNoReauth("http://localhost:8091/v1/login", {
                     method: "POST",
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(userInfo)
                 }, '', (json) => {
+                    commit('clearStore');
                     commit('setUser', json.user);
                     commit('setAuthenticated', true);
                     dispatch('loadMyPosts')
@@ -116,8 +172,8 @@ const store = Vuex.createStore( {
                 console.log("signUp ", error)
             }
         },
-        async loginByCreds ({commit, dispatch}) {
-            try{
+        async loginByCreds({ commit, dispatch }) {
+            try {
                 return makeApiCallNoReauth("http://localhost:8091/v1/granted/login_by_creds", {
                     method: "GET",
                     credentials: 'include',
@@ -130,8 +186,8 @@ const store = Vuex.createStore( {
                 console.log("loginByCreds ", error)
             }
         },
-        async logout ({commit, dispatch}) {
-            try{
+        async logout({ commit, dispatch }) {
+            try {
                 return makeApiCallNoReauth("http://localhost:8091/v1/logout", {
                     method: "GET",
                     credentials: 'include',
@@ -144,11 +200,11 @@ const store = Vuex.createStore( {
                 console.log("logout ", error)
             }
         },
-        async loadMyPosts ({ commit, dispatch }) {
+        async loadMyPosts({ commit, dispatch }) {
             try {
                 console.log("loadMyPosts called");
 
-                return makeApiCallNoReauth("http://localhost:8091/v1/granted/myposts?"+ new URLSearchParams({
+                return makeApiCallNoReauth("http://localhost:8091/v1/granted/myposts?" + new URLSearchParams({
                 }), {
                     method: 'GET',
                     credentials: 'include'
@@ -161,11 +217,11 @@ const store = Vuex.createStore( {
                 console.log("loadMyPosts", error);
             }
         },
-        async submitNewPost ({ commit, dispatch }, newPost) {
+        async submitNewPost({ commit, dispatch }, newPost) {
             try {
                 console.log("submitNewPost called");
 
-                return makeApiCallNoReauth("http://localhost:8091/v1/granted/addpost?"+ new URLSearchParams({
+                return makeApiCallNoReauth("http://localhost:8091/v1/granted/addpost?" + new URLSearchParams({
                 }), {
                     method: 'POST',
                     credentials: 'include',
@@ -179,6 +235,45 @@ const store = Vuex.createStore( {
                 console.log("submitNewPost ", error);
             }
         },
+        async requestUserProfiles({ commit, dispatch }, rangeInfo) {
+            try {
+                return makeApiCallNoReauth("http://localhost:8091/v1/granted/get_profiles?" + new URLSearchParams({
+                    from: rangeInfo.from,
+                    quantity: rangeInfo.quantity
+                }), {
+                    method: 'GET',
+                    credentials: 'include',
+                }, 'user_profiles', (user_profiles) => {
+                    commit('setLastSearchProfilesResults', {
+                        from: rangeInfo.from,
+                        quantity: rangeInfo.quantity,
+                        results: user_profiles
+                    })
+                    return user_profiles
+                })
+            }
+            catch (error) {
+                console.log("requestUserProfiles ", error);
+            }
+        },
+        async requestNewFriend({ commit, dispatch }, friend_id) {
+            try {
+                return makeApiCallNoReauth("http://localhost:8091/v1/granted/new_friend_request?" + new URLSearchParams(
+                    friend_id
+                ), {
+                    method: 'PUT',
+                    credentials: 'include',
+                }, 'profile', (profile) => {
+                    commit('updateProfileInLastSearchProfilesResults', profile)
+                    commit('addFriendProfile', profile)
+                    return profile
+                })
+            }
+            catch (error) {
+                console.log("requestNewFriend ", error);
+            }
+        },
+
         //---------------------------
     },
 });
