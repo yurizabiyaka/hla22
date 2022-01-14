@@ -5,12 +5,12 @@
 }
 
 .activePane {
-    width: 55%;
+    width: 60%;
     float: left;
 }
 
 .paneShrinked {
-    width: 15%; 
+    width: 10%; 
     float: left;
 }
 
@@ -79,6 +79,13 @@ textarea#newtext {
 }
 
 /* ----------- USERPROFILE ------------- */
+.searchUsersPane {
+    background-color: white;
+}
+
+.searchUsersPaneShrinked {
+    background-color: lightsteelblue;
+}
 
 .user_profile_row_1 {
     background-color: lightskyblue;
@@ -90,6 +97,16 @@ textarea#newtext {
 
 .user_profile_emptyrow {
     background-color: whitesmoke;
+}
+
+/* ------------ FRIEND LIST ---------------- */
+
+.friendListPane {
+    background-color: white;
+}
+
+.friendListPaneShrinked {
+    background-color: lightsteelblue;
 }
 
 /* ----------- NEWS ----------------- */

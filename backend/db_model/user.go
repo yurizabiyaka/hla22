@@ -76,7 +76,7 @@ func GetUserProfilesByIndxRange(ctx context.Context, userID uuid.UUID, from, qua
 	rows, err := lab_dbconnect.Conn().QueryContext(ctx,
 		"SELECT indx, UuidFromBin(id), first_name, surname, birth_year, sex, interests, city, friendship_state "+
 			"FROM users LEFT JOIN friends ON id = friend_id AND user_id = UuidToBin(?) "+
-			"WHERE indx BETWEEN ? AND ? ", userID, from, from+quantity)
+			"WHERE indx BETWEEN ? AND ? ", userID, from, from+quantity-1)
 	if err != nil {
 		return nil, err
 	}

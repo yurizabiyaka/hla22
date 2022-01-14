@@ -54,7 +54,7 @@ const NewsShrinked = {
     <div class="newsPaneShrinked">
     <router-link to="/news">NEWS</router-link>
     <table>
-    <tr> <td>New messages:</td> <td>{{ this.$store.getters.count }}</td> </tr>
+    <tr> <td>New messages:</td> <td> </td> </tr>
     </table>
     </div>
     `

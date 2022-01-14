@@ -42,6 +42,8 @@ func ListPublicProfiles(ctx iris.Context) {
 			return
 		}
 
+		logger.Log().Info(fmt.Sprintf("ListPublicProfiles: requested from %s, quantity %s, shown %d, quantity %d", ctx.URLParam("from"), ctx.URLParam("quantity"), from, quantity))
+
 		ctx.JSON(&struct {
 			UserProfiles []app_model.UserProfile `json:"user_profiles"`
 		}{

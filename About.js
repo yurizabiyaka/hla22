@@ -11,7 +11,23 @@ const About = {
     },
     template: `
     <div class="aboutPane">
-    <h1> ABOUT </h1>
+    <h1> About </h1>
+    <table>
+    <tr> <td style="text-align:center"> <b> Домашнее задание №1 </b> </td> </tr>
+    <tr> <td style="text-align:center"> OTUS/Highload Architect </td> </tr>
+    <tr> <td style="text-align:center">  </td> </tr>
+    <tr> <td style="text-align:center"> labOne (c) Юрий Забияка</td> </tr>
+    <tr> <td style="text-align:center">  </td> </tr>
+    <tr> <td style="text-align:center"> Используемые технологии: </td> </tr>
+    <tr> <td > <ul> 
+        <li> <a href="https://v3.vuejs.org"> Vue.js v.3 </a> - Реактивный фреймворк для SPA</li>
+        <li> <a href="https://vuex.vuejs.org"> Vuex v.4 </a> - Хранилище состояния </li>
+        <li> <a href="https://router.vuejs.org/ru/"> Vue router v.4 </a> - SPA навигация </li>
+        <li> <a href="https://go.dev"> go ver.1.17 </a> (golang) для бэкэнда </li>
+        <li> <a href="https://www.iris-go.com"> iris (v12) </a> - веб фреймворк для go </li> 
+        </ul>
+    </td> </tr>
+    </table>
     </div>`
 }
 
@@ -32,8 +48,6 @@ const AboutShrinked = {
     <tr> <td> labOne </td> </tr>
     <tr> <td> (c) </td> </tr>
     <tr> <td> YIZ </td> </tr>
-    <tr> <td> count: </td> </tr>
-    <tr> <td> {{ this.$store.getters.count }} </td> </tr>
     </table>
     </div>`
 }

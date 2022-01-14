@@ -37,7 +37,7 @@ const SearchUsers = {
             'user-profile': UserProfile
     },
     template: `
-    <div class="loginPane">
+    <div class="searchUsersPane">
     <h1> Search users </h1>
     <form>
         <div>
@@ -51,7 +51,7 @@ const SearchUsers = {
         <button type="submit" @click="requestUserProfiles($event)">Search</button>
     </form>
     <table width=100%>
-        <user-profile v-for="profile in userProfiles" :initialProfile="profile" :key="profile.indx" />
+        <user-profile v-for="profile in userProfiles" :initialProfile="profile" :key="profile.index" />
     </table>
     </div>`
 }
@@ -59,7 +59,7 @@ const SearchUsers = {
 const SearchUsersShrinked = {
     template: `
     <div class="searchUsersPaneShrinked">
-        <h4> <router-link to="/search_users">SEARCH USERS</router-link> </h4>
+        <router-link to="/search_users">SEARCH USERS</router-link>
     </div>`
 }
 

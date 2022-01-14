@@ -2,9 +2,10 @@
 import {Default, DefaultShrinked} from './Default.js'
 import {Login, LoginShrinked} from './Login.js'
 import {MyPosts, MyPostsShrinked} from './MyPosts.js'
-import {About, AboutShrinked} from './About.js'
 //import {News, NewsShrinked} from './News.js'
 import { SearchUsers, SearchUsersShrinked } from './SearchUsers.js'
+import { FriendList, FriendListShrinked } from './FriendList.js'
+import {About, AboutShrinked} from './About.js'
 
 import { store } from "./store.js"
 
@@ -12,9 +13,10 @@ const routes = [
   { path: '/', name: 'login', component: Login, },
   { path: '/logout', name: 'logout', redirect: { name: 'login' } }, // this prevents Main to be recreated on logout
   { path: '/myposts', name: 'myposts', component: MyPosts , meta: {  requiresAuth: true, } },
+  { path: '/search_users', name: 'search_users', component: SearchUsers, meta: {  requiresAuth: true, } },
+  { path: '/friend_list', name: 'friendlist', component: FriendList, meta: {  requiresAuth: true, } },
   // { path: '/news', name: 'news', component: News, meta: {  requiresAuth: true, }  },
   { path: '/about', name: 'about', component: About },
-  { path: '/search_users', name: 'search_users', component: SearchUsers },
 ]
 
 // TODO: how to set a default route
@@ -51,8 +53,9 @@ const Main = {
     'pane-login-shrinked': LoginShrinked,
     'pane-myposts-shrinked': MyPostsShrinked,
     //'pane-news-shrinked': NewsShrinked,
-    'pane-about-shrinked':AboutShrinked,
     'pane-search-users-shrinked': SearchUsersShrinked,
+    'pane-friendlist-shrinked': FriendListShrinked,
+    'pane-about-shrinked': AboutShrinked,
   },
   created() {
     this.$store.dispatch('loginByCreds')
@@ -80,6 +83,9 @@ const Main = {
       <div v-if="isPaneActive('search_users')" class="activePane"> <router-view></router-view> </div>
       <div v-else class="paneShrinked"> <pane-search-users-shrinked></pane-search-users-shrinked> </div>
       
+      <div v-if="isPaneActive('friendlist')" class="activePane"> <router-view></router-view> </div>
+      <div v-else class="paneShrinked"> <pane-friendlist-shrinked></pane-friendlist-shrinked> </div>
+
       <div v-if="isPaneActive('about')" class="activePane"> <router-view></router-view> </div>
       <div v-else class="paneShrinked"> <pane-about-shrinked></pane-about-shrinked> </div>
     </div>

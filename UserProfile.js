@@ -39,7 +39,7 @@ export default {
         </td>
     </tr>
     <tr class="user_profile_emptyrow">
-        <td colspan=4> {{ profile.id }} </td>
+        <td colspan=4> </td>
     </tr>
     
     `

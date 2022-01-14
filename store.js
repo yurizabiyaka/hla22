@@ -40,7 +40,6 @@ const store = Vuex.createStore({
             lastSearchProfilesResults: lastSearchProfilesResultsDefaults(),
             myfriends: myfriendsDefaults(),
             //---------------------
-            count: 11,
             news: []
         }
     },
@@ -61,9 +60,6 @@ const store = Vuex.createStore({
             return state.myfriends
         },
         //-------------------------
-        count(state) {
-            return state.count
-        },
         news(state) {
             return state.news;
         },
@@ -123,9 +119,6 @@ const store = Vuex.createStore({
             */
         },
         //------------------------------
-        increment(state, n) {
-            state.count += n
-        },
         changeILikeForPostID(state, postID) {
             const postIdx = state.news.findIndex(function (element, index, array) {
                 return element.id === postID
@@ -166,7 +159,8 @@ const store = Vuex.createStore({
                     commit('clearStore');
                     commit('setUser', json.user);
                     commit('setAuthenticated', true);
-                    dispatch('loadMyPosts')
+                    dispatch('loadMyPosts');
+                    dispatch('loadMyFriends');
                 })
             } catch (error) {
                 console.log("signUp ", error)
@@ -180,7 +174,8 @@ const store = Vuex.createStore({
                 }, '', (json) => {
                     commit('setUser', json.user);
                     commit('setAuthenticated', true);
-                    dispatch('loadMyPosts')
+                    dispatch('loadMyPosts');
+                    dispatch('loadMyFriends');
                 })
             } catch (error) {
                 console.log("loginByCreds ", error)
@@ -271,6 +266,28 @@ const store = Vuex.createStore({
             }
             catch (error) {
                 console.log("requestNewFriend ", error);
+            }
+        },
+        async loadMyFriends({ commit, dispatch }, { from = 0, quantity = 100 } = {}) {
+            try {
+                return makeApiCallNoReauth("http://localhost:8091/v1/granted/myfriends?" + new URLSearchParams({
+                    from: from,
+                    quantity: quantity
+                }), {
+                    method: 'GET',
+                    credentials: 'include',
+                }, '', (json) => {
+                    commit('setLastGetFriendsResults', {
+                        total: json.friends_total,
+                        from: from,
+                        quantity: quantity,
+                        profiles: json.user_profiles
+                    })
+                    return json
+                })
+            }
+            catch (error) {
+                console.log("loadMyFriends ", error);
             }
         },
 

@@ -44,7 +44,7 @@ const MyPosts = {
     },
     template: `
     <div class="myPostsPane">
-    <h1> MYPOSTS </h1>
+    <h1> My posts </h1>
     <form>
        <div>
         <textarea id="newtext" v-model="newText" required autofocus placeholder="Describe your feelings..."/>
@@ -75,7 +75,7 @@ const MyPostsShrinked = {
     },
     template: `
     <div class="myPostsPaneShrinked">
-    <router-link to="/myposts">MYPOSTS</router-link>
+    <router-link to="/myposts">MY POSTS</router-link>
     <table>
         <tr>
             <td>Total posts:</td>
