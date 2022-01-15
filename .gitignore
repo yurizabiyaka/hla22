@@ -1,11 +1,5 @@
-/package-lock.json
-/package.json
-/node_modules
-/docker/labonedb/data/
+/labonedb/data/
+/labonedb/.DS_Store
 /.DS_Store
 /.vscode/
-docker/.DS_Store
-/docker/labonedb/.DS_Store
-/lib/vue3-cookies.js
-/server.js
 

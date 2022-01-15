@@ -12,3 +12,12 @@ services:
       - "./labonedb/data:/var/lib/mysql"
     ports:
       - "3306:3306"
+
+  web:
+    image: nginx:latest
+    volumes:
+      - "./nginx_conf.d:/etc/nginx/conf.d"
+      - "./frontend:/usr/share/nginx/html"
+    ports:
+      - "8080:80"
+

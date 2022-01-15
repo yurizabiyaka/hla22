@@ -25,6 +25,9 @@ const About = {
         <li> <a href="https://router.vuejs.org/ru/"> Vue router v.4 </a> - SPA навигация </li>
         <li> <a href="https://go.dev"> go ver.1.17 </a> (golang) для бэкэнда </li>
         <li> <a href="https://www.iris-go.com"> iris (v12) </a> - веб фреймворк для go </li> 
+        <li> <a href="https://mariadb.com"> mariadb </a> в качестве БД </li> 
+        <li> <a href="https://nginx.org/ru/"> nginx </a> в качестве веб-сервера и реверс-прокси </li> 
+        <li> <a href="https://www.docker.com"> docker </a> чтобы всё это взлетело </li> 
         </ul>
     </td> </tr>
     </table>
