@@ -13,6 +13,11 @@ services:
     ports:
       - "3306:3306"
 
+  lab_one_backend:
+    build: ./backend
+    ports:
+      - "8091:8091"
+  
   web:
     image: nginx:latest
     volumes:

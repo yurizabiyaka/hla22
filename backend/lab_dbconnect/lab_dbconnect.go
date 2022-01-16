@@ -13,7 +13,7 @@ var db *sql.DB
 
 func init() {
 	var err error
-	db, err = sql.Open("mysql", "dbuser:dbpass@/labonedb")
+	db, err = sql.Open("mysql", "dbuser:dbpass@tcp(mariadb:3306)/labonedb")
 	if err != nil {
 		panic(err)
 	}
