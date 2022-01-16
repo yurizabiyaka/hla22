@@ -13,7 +13,7 @@ import (
 const cookieNameForSessionID = "session_id_cookie"
 
 func addAccessControlAllowOrigin(ctx iris.Context) {
-	ctx.ResponseWriter().Header().Add("Access-Control-Allow-Origin", "http://localhost:8080")
+	ctx.ResponseWriter().Header().Add("Access-Control-Allow-Origin", "http://lab-one.ddns.net:8080")
 	ctx.ResponseWriter().Header().Add("Access-Control-Allow-Credentials", "true")
 	ctx.ResponseWriter().Header().Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	ctx.ResponseWriter().Header().Add("Access-Control-Allow-Headers", "Content-Type, Origin, Referer, Accept, User-Agent, Chache-Control, Pragma, Access-Control-Allow-Headers, Authorization, X-Requested-With, Cookie, Content-Length")
