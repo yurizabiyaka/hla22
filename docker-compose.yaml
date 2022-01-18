@@ -17,7 +17,16 @@ services:
     build: ./backend
     ports:
       - "8091:8091"
-  
+    entrypoint: ["echo", "service is disabled for manual run after migrations"]
+    depends_on:
+      - mariadb
+
+  goose:
+    image: artsafin/goose-migrations:latest
+    volumes:
+      - "./labonedb/migrations:/usr/share/migrations"
+    working_dir: "/usr/share/migrations"
+
   web:
     image: nginx:latest
     volumes:
@@ -25,4 +34,6 @@ services:
       - "./frontend:/usr/share/nginx/html"
     ports:
       - "8080:80"
+    depends_on:
+      - lab_one_backend
 
