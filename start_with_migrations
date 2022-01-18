@@ -3,4 +3,4 @@
 docker-compose pull goose
 docker-compose up -d --build
 docker-compose run --rm goose mysql "dbuser:dbpass@tcp(mariadb:3306)/labonedb" up
-docker-compose run -d --service-ports --entrypoint lab_one_backend lab_one_backend 
+docker-compose run -d --name lab_one_backend_run  --service-ports --entrypoint lab_one_backend lab_one_backend 

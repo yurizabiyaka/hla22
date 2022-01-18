@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker stop lab_one_backend_run
+docker-compose stop
