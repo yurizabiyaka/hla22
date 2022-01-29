@@ -5,6 +5,7 @@ DB_NAME=labonedb
 CORS_ORIGIN=http://localhost:8080
 LISTEN_HOSTANDPORT=localhost:8091
 FRONTEND_BACKEND_PROTOCOL=http
+FRONTEND_BACKEND_HOSTANDPORT=localhost:8091
 FRONTEND_BACKEND_API_PREFIX=/v1
 # FRONTEND_BACKEND_PROTOCOL + "://" + LISTEN_HOSTANDPORT + "/v1" = http://localhost:8091/v1 .. and then api call
 #CORS_ORIGIN=http://lab-one.ddns.net:8080
