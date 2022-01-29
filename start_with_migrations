@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cp ./env_file_back_and_front ./backend/config.env
+./shell_scripts/convert_kv2json.sh ./env_file_back_and_front > ./frontend/config_env_file.js
 docker-compose pull goose
 docker-compose up -d --build
 docker-compose run --rm goose mysql "dbuser:dbpass@tcp(mariadb:3306)/labonedb" up

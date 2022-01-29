@@ -2,7 +2,9 @@ package main
 
 import (
 	"github.com/yurizabiyaka/hla22/lab_one_backend/authentication"
+	"github.com/yurizabiyaka/hla22/lab_one_backend/config"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/friends"
+	_ "github.com/yurizabiyaka/hla22/lab_one_backend/lab_dbconnect"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/login"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/user_posts"
 
@@ -13,7 +15,7 @@ import (
 const cookieNameForSessionID = "session_id_cookie"
 
 func addAccessControlAllowOrigin(ctx iris.Context) {
-	ctx.ResponseWriter().Header().Add("Access-Control-Allow-Origin", "http://lab-one.ddns.net:8080")
+	ctx.ResponseWriter().Header().Add("Access-Control-Allow-Origin", config.GetCORSOrigin())
 	ctx.ResponseWriter().Header().Add("Access-Control-Allow-Credentials", "true")
 	ctx.ResponseWriter().Header().Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	ctx.ResponseWriter().Header().Add("Access-Control-Allow-Headers", "Content-Type, Origin, Referer, Accept, User-Agent, Chache-Control, Pragma, Access-Control-Allow-Headers, Authorization, X-Requested-With, Cookie, Content-Length")
@@ -65,5 +67,5 @@ func main() {
 		}
 	}
 
-	app.Listen(":8091")
+	app.Listen(config.GetListenHostAndPort())
 }

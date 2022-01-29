@@ -1,0 +1,4 @@
+#!/bin/bash
+
+./shell_scripts/convert_kv2json.sh ./env_file_back_and_front > ./frontend/config_env_file.js
+docker-compose run --no-deps -d --rm --name web_run  --service-ports web

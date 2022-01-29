@@ -2,4 +2,5 @@
 
 docker stop lab_one_backend_run
 docker rm lab_one_backend_run
+docker rm web_run
 docker-compose stop

@@ -1,3 +1,5 @@
+import config from "./config.js"
+
 async function makeApiCallNoReauth(url, fetchOptions, tag, okCallback) {
     const response = await fetch(url, fetchOptions);
     const json = await response.json();
@@ -134,7 +136,7 @@ const store = Vuex.createStore({
     actions: {
         async submitNewUser({ commit, dispatch }, newUser) {
             try {
-                return makeApiCallNoReauth("http://lab-one.ddns.net:8091/v1/new_user", {
+                return makeApiCallNoReauth(config.backendUrl()+"/new_user", {
                     method: "PUT",
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
@@ -150,7 +152,7 @@ const store = Vuex.createStore({
         },
         async signUp({ commit, dispatch }, userInfo) {
             try {
-                return makeApiCallNoReauth("http://lab-one.ddns.net:8091/v1/login", {
+                return makeApiCallNoReauth(config.backendUrl()+"/login", {
                     method: "POST",
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
@@ -168,7 +170,7 @@ const store = Vuex.createStore({
         },
         async loginByCreds({ commit, dispatch }) {
             try {
-                return makeApiCallNoReauth("http://lab-one.ddns.net:8091/v1/granted/login_by_creds", {
+                return makeApiCallNoReauth(config.backendUrl()+"/granted/login_by_creds", {
                     method: "GET",
                     credentials: 'include',
                 }, '', (json) => {
@@ -183,7 +185,7 @@ const store = Vuex.createStore({
         },
         async logout({ commit, dispatch }) {
             try {
-                return makeApiCallNoReauth("http://lab-one.ddns.net:8091/v1/logout", {
+                return makeApiCallNoReauth(config.backendUrl()+"/logout", {
                     method: "GET",
                     credentials: 'include',
                 }, '', (json) => {
@@ -199,7 +201,7 @@ const store = Vuex.createStore({
             try {
                 console.log("loadMyPosts called");
 
-                return makeApiCallNoReauth("http://lab-one.ddns.net:8091/v1/granted/myposts?" + new URLSearchParams({
+                return makeApiCallNoReauth(config.backendUrl()+"/granted/myposts?" + new URLSearchParams({
                 }), {
                     method: 'GET',
                     credentials: 'include'
@@ -216,7 +218,7 @@ const store = Vuex.createStore({
             try {
                 console.log("submitNewPost called");
 
-                return makeApiCallNoReauth("http://lab-one.ddns.net:8091/v1/granted/addpost?" + new URLSearchParams({
+                return makeApiCallNoReauth(config.backendUrl()+"/granted/addpost?" + new URLSearchParams({
                 }), {
                     method: 'POST',
                     credentials: 'include',
@@ -232,7 +234,7 @@ const store = Vuex.createStore({
         },
         async requestUserProfiles({ commit, dispatch }, rangeInfo) {
             try {
-                return makeApiCallNoReauth("http://lab-one.ddns.net:8091/v1/granted/get_profiles?" + new URLSearchParams({
+                return makeApiCallNoReauth(config.backendUrl()+"/granted/get_profiles?" + new URLSearchParams({
                     from: rangeInfo.from,
                     quantity: rangeInfo.quantity
                 }), {
@@ -253,7 +255,7 @@ const store = Vuex.createStore({
         },
         async requestNewFriend({ commit, dispatch }, friend_id) {
             try {
-                return makeApiCallNoReauth("http://lab-one.ddns.net:8091/v1/granted/new_friend_request?" + new URLSearchParams(
+                return makeApiCallNoReauth(config.backendUrl()+"/granted/new_friend_request?" + new URLSearchParams(
                     friend_id
                 ), {
                     method: 'PUT',
@@ -270,7 +272,7 @@ const store = Vuex.createStore({
         },
         async loadMyFriends({ commit, dispatch }, { from = 0, quantity = 100 } = {}) {
             try {
-                return makeApiCallNoReauth("http://lab-one.ddns.net:8091/v1/granted/myfriends?" + new URLSearchParams({
+                return makeApiCallNoReauth(config.backendUrl()+"/granted/myfriends?" + new URLSearchParams({
                     from: from,
                     quantity: quantity
                 }), {

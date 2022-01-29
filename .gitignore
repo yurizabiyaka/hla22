@@ -2,4 +2,6 @@
 /labonedb/.DS_Store
 /.DS_Store
 /.vscode/
-
+/docker
+/backend/config.env
+/frontend/config_env_file.js

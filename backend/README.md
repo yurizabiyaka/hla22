@@ -21,3 +21,20 @@
 - [ ] setting likes
 - [ ] making comments
 - [ ] feature-list section in abouts
+
+# Description
+## backend
+
+The backend uses config file ***config.env*** in the home directory with key=value pairs:
+
+|variable name | description |
+| ----------- | ----------- |
+|DB_HOSTANDPORT | database e.g. *localhost:3306* |
+|DB_USER | *dbuser* |
+|DB_PASSWORD | *dbpass* |
+|DB_NAME | *labonedb* |
+|CORS_ORIGIN | requests from that origin will be allowed by a browser. E.g. if our frontend is running on https host lab-one.ru and port is 80, the setting should be *https://lab-one.ru:80*. This does not corresponds to backend port, but the backend should refer this origin in Access-Control-Allow-Origin header for the browser making the request |
+|LISTEN_HOSTANDPORT | this is where backend listens to requests |
+
+You can override them in system environment.
+
