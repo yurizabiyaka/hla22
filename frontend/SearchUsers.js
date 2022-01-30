@@ -1,8 +1,5 @@
 // SearchUsers.js
 import UserProfile from "./UserProfile.js"
-import {InfiniteScrollVue3} from "./lib/infinite-scroll-vue3.min.js"
-
-console.log("SearchUsers: InfiniteScrollVue3",  InfiniteScrollVue3)
 
 const SearchUsers = {
     data() {
@@ -10,8 +7,6 @@ const SearchUsers = {
             requestFrom: 0,
             requestQuant: 100,
             userProfiles: [],
-            noResult: false,
-            message: "",
         }
     },
     created() {
@@ -37,7 +32,7 @@ const SearchUsers = {
                 }
             })
        },
-       infiniteHandler() {
+       infiniteHandler({ loaded }) {
         console.log("infiniteHandler")
             this.$store.dispatch('requestUserProfiles', {
                 from: this.requestFrom,
@@ -51,18 +46,19 @@ const SearchUsers = {
                         console.log("got profiles:", answer.user_profiles.length)
                         this.requestFrom += this.requestQuant;
                         this.userProfiles.push(...answer.user_profiles);
+                        loaded(this.requestQuant, this.requestQuant);
                     } else {
                         console.log("no profiles")
                         this.noResult = true;
                         this.message = "No result found";
+                        loaded(this.requestQuant, this.requestQuant);
                     }
                 }
             })
-        }
+        },
     },
     components: {
             'user-profile': UserProfile,
-            'infinite-scroll-vue3': InfiniteScrollVue3,
     },
     template: `
     <div class="searchUsersPane">
@@ -83,13 +79,8 @@ const SearchUsers = {
     </table>
     <span>---------------</span>
 
-<infinite-scroll-vue3 @infinite-scroll="infiniteHandler"
-:message="message"
-:noResult="noResult"
->
-<user-profile v-for="profile in userProfiles" :initialProfile="profile" :key="profile.index" />
-</infinite-scroll-vue3>
-
+    <user-profile v-for="profile in userProfiles" :initialProfile="profile" :key="profile.index" />
+    <VueEternalLoading :load="infiniteHandler"></VueEternalLoading>
 
     </div>`
 }
