@@ -108,3 +108,27 @@ func AddPost(ctx iris.Context) {
 type NewUserPost struct {
 	Text string `json:"text"`
 }
+
+// ListMyNews
+func ListMyNews(ctx iris.Context) {
+	if userId, ok := sessions.Get(ctx).Get(app_model.USERID_CTX_KEY).(string); ok {
+		news, err := db_model.LoadNews(ctx.Request().Context(), uuid.MustParse(userId))
+		if err != nil {
+			logger.Log().Error(err.Error())
+			ctx.JSON(&lab_error.LabError{
+				Failed:       true,
+				ErrorCode:    -10, // any db error
+				ErrorMessage: err.Error(),
+			})
+			return
+		}
+
+		logger.Log().Info(fmt.Sprintf("ListMyNews: user %s", userId))
+
+		ctx.JSON(&struct {
+			News []app_model.UserPost `json:"news"`
+		}{
+			News: news,
+		})
+	}
+}

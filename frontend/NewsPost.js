@@ -1,21 +1,24 @@
 // NewsPost.js
 export default {
-    props: {
-        id: Number,
-        from: String,
-        text: String,
-        likes: Number,
-        iLike: Boolean,
+    props:  {
+        initialPost: Object,
+        mode: String, // accepts 'my', 'mews'
+    },
+    data(){
+        return {
+            post: this.initialPost,
+            actions_mode: this.mode,
+        }
     },
     emits: ['changeLike'],
     template: `
     <table>
         <tr> 
-            <td> {{ from }} </td> 
-            <td> {{ text }} </td> 
+            <td> {{ post.from }} </td> 
+            <td> {{ post.text }} </td> 
         </tr>
         <tr>
-            <td> Likes: {{ likes }} </td>
+            <td> Likes: {{ post.likes }} </td>
             <td> I Like: <button @click="$emit('changeLike', id)"> {{ iLike ? '❤️' : '🤍' }} </button> </td>
         </tr>
     </table>`

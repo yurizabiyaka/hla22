@@ -23,6 +23,7 @@ const About = {
         <li> <a href="https://v3.vuejs.org"> Vue.js v.3 </a> - Реактивный фреймворк для SPA</li>
         <li> <a href="https://vuex.vuejs.org"> Vuex v.4 </a> - Хранилище состояния </li>
         <li> <a href="https://router.vuejs.org/ru/"> Vue router v.4 </a> - SPA навигация </li>
+        <li> <a href="https://www.npmjs.com/package/infinite-loading-vue3-ts"> Vue3 infinite loading</a> для постраничного запроса данных </li>
         <li> <a href="https://go.dev"> go ver.1.17 </a> (golang) для бэкэнда </li>
         <li> <a href="https://www.iris-go.com"> iris (v12) </a> - веб фреймворк для go </li> 
         <li> <a href="https://mariadb.com"> mariadb </a> в качестве БД </li> 

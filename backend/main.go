@@ -53,6 +53,7 @@ func main() {
 			v1granted.Get("/login_by_creds", login.ByCreds)
 
 			v1granted.Get("/myposts", user_posts.ListMyPosts)
+			v1granted.Get("/mynews", user_posts.ListMyNews)
 
 			v1granted.Options("/addpost", authentication.OptionsStub)
 			v1granted.Post("/addpost", user_posts.AddPost)
@@ -64,6 +65,11 @@ func main() {
 
 			v1granted.Options("/myfriends", authentication.OptionsStub)
 			v1granted.Get("/myfriends", friends.ListMyFriends)
+
+			v1granted.Options("/myfriendrequests", authentication.OptionsStub)
+			v1granted.Get("/myfriendrequests", friends.ListMyFriendRequests)
+
+			v1granted.Get("/accept_friend_request", friends.AcceptFriendRequest)
 		}
 	}
 

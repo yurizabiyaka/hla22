@@ -23,3 +23,13 @@ func CreateFriendRequest(ctx context.Context, userID, friendID uuid.UUID) error 
 	}
 	return nil
 }
+
+func AcceptFriendRequest(ctx context.Context, userID, friendID uuid.UUID) error {
+	_, err := lab_dbconnect.Conn().ExecContext(ctx,
+		"UPDATE friends SET friendship_state = 'acknowledged', last_state_date = NOW() "+
+			"WHERE user_id = UuidToBin(?) AND friend_id = UuidToBin(?)", friendID, userID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -5,3 +5,7 @@
 /docker
 /backend/config.env
 /frontend/config_env_file.js
+/frontend/node_modules
+/data_generators/users/gen_users
+/frontend/package-lock.json
+/frontend/package.json

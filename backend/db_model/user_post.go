@@ -55,3 +55,38 @@ func LoadPosts(ctx context.Context, userID uuid.UUID) ([]app_model.UserPost, err
 
 	return posts, nil
 }
+
+// LoadNews loads all posts from user friends
+func LoadNewsByRange(ctx context.Context, userID uuid.UUID, from, quantity uint64) ([]app_model.UserPost, error) {
+	rows, err := lab_dbconnect.Conn().QueryContext(ctx,
+		"SELECT UuidFromBin(id), UuidFromBin(user_id), text, date_time, likes_count, comments_count "+
+			"FROM posts "+
+			"WHERE user_id = UuidToBin(?) "+
+			"ORDER BY date_time DESC", userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []app_model.UserPost
+	aPost := app_model.UserPost{}
+	for rows.Next() {
+		err := rows.Scan(&aPost.ID, &aPost.UserID, &aPost.Text, &aPost.DateStr, &aPost.LikesCount, &aPost.CommentsCount)
+		if err != nil {
+			return nil, err
+		}
+		// convert db date into app date
+		aPost.Date, err = time.Parse(lab_dbconnect.DateFormat, aPost.DateStr)
+		if err != nil {
+			return nil, err
+		}
+		aPost.DateStr = aPost.Date.Format(app_model.DATEFORMAT)
+		posts = append(posts, aPost)
+	}
+	err = rows.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}

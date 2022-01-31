@@ -20,21 +20,12 @@ const News = {
     created() {
         console.log('NEWS created')
     },
-    beforeUpdate(){
-        console.log('NEWS before update')
-    },
-    beforeUnmount(){
-        console.log('NEWS before unmount')
-    },
     template: `
     <div class="newsPane">
         <div v-for="post in news">
             <news-post @change-like="changeILikeForPost"
-                :id="post.id"
-                :from="post.from"
-                :text="post.text"
-                :likes="post.likes" 
-                :iLike="post.iLike" 
+                :initialPost="post"
+                :mode="news" 
             ></news-post>
         </div>
     </div>`,

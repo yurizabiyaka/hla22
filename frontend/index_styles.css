@@ -109,6 +109,16 @@ textarea#newtext {
     background-color: lightsteelblue;
 }
 
+/* ------------ FRIEND REQUESTS ---------------- */
+
+.friendRequestsPane {
+    background-color: white;
+}
+
+.friendRequestsPaneShrinked {
+    background-color: lightsteelblue;
+}
+
 /* ----------- NEWS ----------------- */
 
 .newsPane {
@@ -130,4 +140,3 @@ textarea#newtext {
 }
 
 /* ----------- BOTTOM ----------------- */
-

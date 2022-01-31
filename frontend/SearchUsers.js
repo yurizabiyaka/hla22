@@ -5,7 +5,7 @@ const SearchUsers = {
     data() {
         return {
             requestFrom: 0,
-            requestQuant: 100,
+            requestQuant: 1,
             userProfiles: [],
         }
     },
@@ -16,23 +16,7 @@ const SearchUsers = {
         this.userProfiles = lastResults.results;
     },
     methods: {
-        requestUserProfiles(event) {
-            if (event) {
-                event.preventDefault()
-            }
-            this.$store.dispatch('requestUserProfiles', {
-                from: this.requestFrom,
-                quantity: this.requestQuant
-            })
-            .then((answer)=> {
-                if (answer.failed) {
-                    alert(answer.error_message)
-                } else {
-                    this.userProfiles = answer.user_profiles
-                }
-            })
-       },
-       infiniteHandler({ loaded }) {
+       infiniteHandler(state) {
         console.log("infiniteHandler")
             this.$store.dispatch('requestUserProfiles', {
                 from: this.requestFrom,
@@ -41,17 +25,19 @@ const SearchUsers = {
             .then((answer)=> {
                 if (answer.failed) {
                     alert(answer.error_message)
+                    state.error();
                 } else {
                     if (answer.user_profiles && answer.user_profiles.length) {
-                        console.log("got profiles:", answer.user_profiles.length)
-                        this.requestFrom += this.requestQuant;
+                        this.requestFrom += answer.user_profiles.length;
                         this.userProfiles.push(...answer.user_profiles);
-                        loaded(this.requestQuant, this.requestQuant);
+                        this.$store.commit('setLastSearchProfilesResults', {
+                            from: this.requestFrom,
+                            quantity: this.requestQuant,
+                            results: this.userProfiles
+                        })
+                        state.loaded();
                     } else {
-                        console.log("no profiles")
-                        this.noResult = true;
-                        this.message = "No result found";
-                        loaded(this.requestQuant, this.requestQuant);
+                        state.complete();
                     }
                 }
             })
@@ -59,28 +45,26 @@ const SearchUsers = {
     },
     components: {
             'user-profile': UserProfile,
+            'infinite-loading': InfiniteLoadingVue3Ts,
     },
     template: `
     <div class="searchUsersPane">
     <h1> Search users </h1>
-    <form>
         <div>
-            <label for="requestFrom"> Request profiles from index: </label>
-            <input id="requestFrom" type="number" v-model="requestFrom" required autofocus placeholder="Request from" />
-            </div>
+            <label for="requestFrom"> Displayed profiles: </label>
+            <input id="requestFrom" type="number" v-model="requestFrom" readonly="readonly" />
+        </div>
         <div>
-            <label for="requestQuantity"> Number of profiles to request: </label>
+            <label for="requestQuantity"> Page size: </label>
             <input id="requestQuantity" type="number" v-model="requestQuant" required placeholder="Quantity" />
         </div>
-        <button type="submit" @click="requestUserProfiles($event)">Search</button>
-    </form>
-    <table width=100%>
-        <user-profile v-for="profile in userProfiles" :initialProfile="profile" :key="profile.index" />
-    </table>
-    <span>---------------</span>
 
-    <user-profile v-for="profile in userProfiles" :initialProfile="profile" :key="profile.index" />
-    <VueEternalLoading :load="infiniteHandler"></VueEternalLoading>
+        <table width=100%>
+            <user-profile v-for="profile in userProfiles" :initialProfile="profile" :key="profile.index" mode="search" />
+        </table>
+        <infinite-loading  @infinite="infiniteHandler"> 
+            <template #no-more>no more data</template>
+        </infinite-loading>
 
     </div>`
 }

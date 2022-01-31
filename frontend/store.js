@@ -19,7 +19,7 @@ function myfriendsDefaults() {
     return {
         total: 0,
         from: 0,
-        quantity: 100,
+        quantity: 25,
         profiles: []
     }
 }
@@ -27,8 +27,23 @@ function myfriendsDefaults() {
 function lastSearchProfilesResultsDefaults() {
     return {
         from: 0,
-        quantity: 100,
+        quantity: 25,
         results: []
+    }
+}
+
+function myfriendRequestsDefaults() {
+    return {
+        total: 0,
+        from: 0,
+        quantity: 25,
+        profiles: []
+    }
+}
+
+function paneGroupModesDefaults() {
+    return {
+        friends: "/friend_list"
     }
 }
 
@@ -41,6 +56,8 @@ const store = Vuex.createStore({
             myposts: [],
             lastSearchProfilesResults: lastSearchProfilesResultsDefaults(),
             myfriends: myfriendsDefaults(),
+            myFriendRequests: myfriendRequestsDefaults(),
+            paneGroupModes: paneGroupModesDefaults(),
             //---------------------
             news: []
         }
@@ -60,6 +77,12 @@ const store = Vuex.createStore({
         },
         lastGetFriendsResults: (state) => {
             return state.myfriends
+        },
+        lastGetFriendRequestsResults: (state) => {
+            return state.myFriendRequests
+        },
+        getPaneMode: (state) => (paneGroup) => {
+            return state.paneGroupModes[paneGroup]
         },
         //-------------------------
         news(state) {
@@ -82,6 +105,9 @@ const store = Vuex.createStore({
             // TODO make init function
             state.lastSearchProfilesResults = lastSearchProfilesResultsDefaults();
             state.myfriends = myfriendsDefaults();
+            state.loadMyFriendRequests = myfriendRequestsDefaults();
+            state.myFriendRequests = myfriendRequestsDefaults();
+            state.paneGroupModes = paneGroupModesDefaults();
         },
         addNewPost(state, myPost) {
             if (!state.myposts) {
@@ -100,7 +126,7 @@ const store = Vuex.createStore({
             const idx = state.lastSearchProfilesResults.results.findIndex((currElement) => {
                 return currElement.id === profile.id
             })
-            if (idx>0) {
+            if (idx>=0) {
                 state.lastSearchProfilesResults.results[idx]=profile
             }
         },
@@ -119,6 +145,28 @@ const store = Vuex.createStore({
                 state.myfriends.unshift(profile)
             }
             */
+        },
+        setFriendsTotal(state, results){
+            state.myfriends.total = results.friends_total
+        },
+        setLastMyFriendRequests(state, results){
+            state.myFriendRequests = results
+        },
+        setFriendRequestsTotal(state, results){
+            state.myFriendRequests.total = results.friend_requests_total
+        },
+        updateProfileInLastGetFriendRequestsResults(state, profile) {
+            const idx = state.myFriendRequests.profiles.findIndex((currElement) => {
+                return currElement.id === profile.id
+            })
+            if (idx>=0) {
+                state.myFriendRequests.profiles[idx]=profile
+            } else {
+                console.log("cannot find", profile, state.myFriendRequests.profiles)
+            }
+        },
+        setPaneMode: (state, pane) => {
+            state.paneGroupModes[pane.group] = pane.mode
         },
         //------------------------------
         changeILikeForPostID(state, postID) {
@@ -163,6 +211,7 @@ const store = Vuex.createStore({
                     commit('setAuthenticated', true);
                     dispatch('loadMyPosts');
                     dispatch('loadMyFriends');
+                    dispatch('loadMyFriendRequests');
                 })
             } catch (error) {
                 console.log("signUp ", error)
@@ -178,6 +227,7 @@ const store = Vuex.createStore({
                     commit('setAuthenticated', true);
                     dispatch('loadMyPosts');
                     dispatch('loadMyFriends');
+                    dispatch('loadMyFriendRequests');
                 })
             } catch (error) {
                 console.log("loginByCreds ", error)
@@ -241,11 +291,6 @@ const store = Vuex.createStore({
                     method: 'GET',
                     credentials: 'include',
                 }, 'user_profiles', (user_profiles) => {
-                    commit('setLastSearchProfilesResults', {
-                        from: rangeInfo.from,
-                        quantity: rangeInfo.quantity,
-                        results: user_profiles
-                    })
                     return user_profiles
                 })
             }
@@ -270,7 +315,7 @@ const store = Vuex.createStore({
                 console.log("requestNewFriend ", error);
             }
         },
-        async loadMyFriends({ commit, dispatch }, { from = 0, quantity = 100 } = {}) {
+        async loadMyFriends({ commit, dispatch }, { from = 0, quantity = 1 } = {}) {
             try {
                 return makeApiCallNoReauth(config.backendUrl()+"/granted/myfriends?" + new URLSearchParams({
                     from: from,
@@ -279,12 +324,7 @@ const store = Vuex.createStore({
                     method: 'GET',
                     credentials: 'include',
                 }, '', (json) => {
-                    commit('setLastGetFriendsResults', {
-                        total: json.friends_total,
-                        from: from,
-                        quantity: quantity,
-                        profiles: json.user_profiles
-                    })
+                    json.user_profiles && commit('setFriendsTotal', json)
                     return json
                 })
             }
@@ -292,7 +332,57 @@ const store = Vuex.createStore({
                 console.log("loadMyFriends ", error);
             }
         },
+        async loadMyFriendRequests({ commit, dispatch }, { from = 0, quantity = 1 } = {}) {
+            try {
+                return makeApiCallNoReauth(config.backendUrl()+"/granted/myfriendrequests?" + new URLSearchParams({
+                    from: from,
+                    quantity: quantity
+                }), {
+                    method: 'GET',
+                    credentials: 'include',
+                }, '', (json) => {
+                    json.user_profiles && commit('setFriendRequestsTotal', json)
+                    return json
+                })
+            }
+            catch (error) {
+                console.log("loadMyFriendRequests ", error);
+            }
+        },
+        async acceptFriendRequest({ commit, dispatch }, friend_id) {
+            try {
+                return makeApiCallNoReauth(config.backendUrl()+"/granted/accept_friend_request?" + new URLSearchParams(
+                    friend_id
+                ), {
+                    method: 'GET',
+                    credentials: 'include',
+                }, 'profile', (profile) => {
+                    commit('updateProfileInLastGetFriendRequestsResults', profile)
+                    //commit('addFriendProfile', profile)
+                    return profile
+                })
+            }
+            catch (error) {
+                console.log("acceptFriendRequest ", error);
+            }
+        },
+        async loadMyNews({ commit, dispatch }) {
+            try {
+                console.log("loadMyNews called");
 
+                return makeApiCallNoReauth(config.backendUrl()+"/granted/mynews?" + new URLSearchParams({
+                }), {
+                    method: 'GET',
+                    credentials: 'include'
+                }, '', (json) => {
+                    console.log("loadMyNews json: ", json);
+                    return json
+                })
+            }
+            catch (error) {
+                console.log("loadMyNews", error);
+            }
+        },
         //---------------------------
     },
 });

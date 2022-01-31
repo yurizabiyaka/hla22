@@ -5,6 +5,7 @@ import {MyPosts, MyPostsShrinked} from './MyPosts.js'
 //import {News, NewsShrinked} from './News.js'
 import { SearchUsers, SearchUsersShrinked } from './SearchUsers.js'
 import { FriendList, FriendListShrinked } from './FriendList.js'
+import { FriendRequests, FriendRequestsShrinked } from './FriendRequests.js'
 import {About, AboutShrinked} from './About.js'
 
 import { store } from "./store.js"
@@ -15,6 +16,7 @@ const routes = [
   { path: '/myposts', name: 'myposts', component: MyPosts , meta: {  requiresAuth: true, } },
   { path: '/search_users', name: 'search_users', component: SearchUsers, meta: {  requiresAuth: true, } },
   { path: '/friend_list', name: 'friendlist', component: FriendList, meta: {  requiresAuth: true, } },
+  { path: '/friend_requests', name: 'friendrequests', component: FriendRequests, meta: {  requiresAuth: true, } },
   // { path: '/news', name: 'news', component: News, meta: {  requiresAuth: true, }  },
   { path: '/about', name: 'about', component: About },
 ]
@@ -55,10 +57,17 @@ const Main = {
     //'pane-news-shrinked': NewsShrinked,
     'pane-search-users-shrinked': SearchUsersShrinked,
     'pane-friendlist-shrinked': FriendListShrinked,
+    'pane-friendrequests-shrinked': FriendRequestsShrinked,
     'pane-about-shrinked': AboutShrinked,
   },
   created() {
     this.$store.dispatch('loginByCreds')
+  },
+  computed: {
+    friendMode(){
+      let curmode = this.$store.getters.getPaneMode("friends")
+      return curmode
+    },
   },
   methods: {
     isPaneActive(name) {
@@ -69,9 +78,6 @@ const Main = {
       return false
     }
   },
-  computed: {
-  },
-
   template: `
     <div class=boyan>
       <div v-if="isPaneActive('login')" class="activePane"> <router-view></router-view> </div>
@@ -83,11 +89,16 @@ const Main = {
       <div v-if="isPaneActive('search_users')" class="activePane"> <router-view></router-view> </div>
       <div v-else class="paneShrinked"> <pane-search-users-shrinked></pane-search-users-shrinked> </div>
       
-      <div v-if="isPaneActive('friendlist')" class="activePane"> <router-view></router-view> </div>
-      <div v-else class="paneShrinked"> <pane-friendlist-shrinked></pane-friendlist-shrinked> </div>
+      <div      v-if="isPaneActive('friendlist')" class="activePane"> <router-view></router-view> </div>
+      <div v-else-if="isPaneActive('friendrequests')" class="activePane"> <router-view></router-view> </div>
+      <div v-else-if="friendMode === '/friend_list'" class="paneShrinked"> <pane-friendlist-shrinked></pane-friendlist-shrinked> </div>
+      <div v-else class="paneShrinked"> <pane-friendrequests-shrinked></pane-friendrequests-shrinked> </div>
 
       <div v-if="isPaneActive('about')" class="activePane"> <router-view></router-view> </div>
       <div v-else class="paneShrinked"> <pane-about-shrinked></pane-about-shrinked> </div>
+
+      <!--
+      -->
     </div>
   `,
 }
