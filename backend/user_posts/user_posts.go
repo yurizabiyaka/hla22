@@ -3,6 +3,7 @@ package user_posts
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/yurizabiyaka/hla22/lab_one_backend/app_model"
@@ -11,7 +12,7 @@ import (
 	"github.com/yurizabiyaka/hla22/lab_one_backend/logger"
 
 	"github.com/google/uuid"
-	"github.com/kataras/iris/v12"
+	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/sessions"
 )
 
@@ -59,7 +60,7 @@ func ListMyPosts(ctx iris.Context) {
 
 func AddPost(ctx iris.Context) {
 	if userId, ok := sessions.Get(ctx).Get(app_model.USERID_CTX_KEY).(string); ok {
-		newPost := NewUserPost{}
+		newPost := app_model.NewUserPost{}
 		err := ctx.ReadJSON(&newPost)
 		if err != nil {
 			err := fmt.Errorf("AddPost: failed to read json: %w", err)
@@ -104,15 +105,23 @@ func AddPost(ctx iris.Context) {
 	}
 }
 
-// NewUserPost structure of incoming new post created
-type NewUserPost struct {
-	Text string `json:"text"`
-}
-
 // ListMyNews
 func ListMyNews(ctx iris.Context) {
 	if userId, ok := sessions.Get(ctx).Get(app_model.USERID_CTX_KEY).(string); ok {
-		news, err := db_model.LoadNews(ctx.Request().Context(), uuid.MustParse(userId))
+		from, err1 := strconv.ParseUint(ctx.URLParamDefault("from", "0"), 10, 64)
+		quantity, err2 := strconv.ParseUint(ctx.URLParamDefault("quantity", "100"), 10, 64)
+		if err1 != nil || err2 != nil {
+			err := fmt.Errorf("ListMyNews: failed to parse from/quantity")
+			logger.Log().Error(err.Error())
+			ctx.JSON(&lab_error.LabError{
+				Failed:       true,
+				ErrorCode:    -2, // any deserialization error
+				ErrorMessage: err.Error(),
+			})
+			return
+		}
+
+		news, err := db_model.LoadNewsByRange(ctx.Request().Context(), uuid.MustParse(userId), from, quantity)
 		if err != nil {
 			logger.Log().Error(err.Error())
 			ctx.JSON(&lab_error.LabError{
@@ -126,7 +135,7 @@ func ListMyNews(ctx iris.Context) {
 		logger.Log().Info(fmt.Sprintf("ListMyNews: user %s", userId))
 
 		ctx.JSON(&struct {
-			News []app_model.UserPost `json:"news"`
+			News []app_model.FriendPost `json:"news"`
 		}{
 			News: news,
 		})

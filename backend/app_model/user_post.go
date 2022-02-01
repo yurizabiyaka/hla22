@@ -15,3 +15,9 @@ type UserPost struct {
 	LikesCount    uint      `json:"likes_count"`
 	CommentsCount uint      `json:"comments_count"`
 }
+
+// NewUserPost structure of incoming new post created
+type NewUserPost struct {
+	Text string `json:"text"`
+}
+

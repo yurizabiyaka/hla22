@@ -12,14 +12,18 @@ export default {
     },
     emits: ['changeLike'],
     template: `
-    <table>
         <tr> 
-            <td> {{ post.from }} </td> 
-            <td> {{ post.text }} </td> 
+            <td> {{ post.friend_name }} {{ post.friend_surname }} </td> 
+            <td> {{ post.date_time }} </td>
+            <td>  </td>
+        </tr>
+        <tr> 
+            <td colspan=3> {{ post.text }} </td> 
         </tr>
         <tr>
-            <td> Likes: {{ post.likes }} </td>
-            <td> I Like: <button @click="$emit('changeLike', id)"> {{ iLike ? '❤️' : '🤍' }} </button> </td>
+            <td> Likes: {{ post.likes_count }} </td>
+            <td> I Like: <button @click="$emit('changeLike', id)"> {{ post.i_like ? '❤️' : '🤍' }} </button> </td>
+            <td> Comments: {{ post.comments_count }} </td>
         </tr>
-    </table>`
+    `
 }

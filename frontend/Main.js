@@ -2,7 +2,7 @@
 import {Default, DefaultShrinked} from './Default.js'
 import {Login, LoginShrinked} from './Login.js'
 import {MyPosts, MyPostsShrinked} from './MyPosts.js'
-//import {News, NewsShrinked} from './News.js'
+import {News, NewsShrinked} from './News.js'
 import { SearchUsers, SearchUsersShrinked } from './SearchUsers.js'
 import { FriendList, FriendListShrinked } from './FriendList.js'
 import { FriendRequests, FriendRequestsShrinked } from './FriendRequests.js'
@@ -17,7 +17,7 @@ const routes = [
   { path: '/search_users', name: 'search_users', component: SearchUsers, meta: {  requiresAuth: true, } },
   { path: '/friend_list', name: 'friendlist', component: FriendList, meta: {  requiresAuth: true, } },
   { path: '/friend_requests', name: 'friendrequests', component: FriendRequests, meta: {  requiresAuth: true, } },
-  // { path: '/news', name: 'news', component: News, meta: {  requiresAuth: true, }  },
+  { path: '/news', name: 'news', component: News, meta: {  requiresAuth: true, }  },
   { path: '/about', name: 'about', component: About },
 ]
 
@@ -54,7 +54,7 @@ const Main = {
   components: {
     'pane-login-shrinked': LoginShrinked,
     'pane-myposts-shrinked': MyPostsShrinked,
-    //'pane-news-shrinked': NewsShrinked,
+    'pane-news-shrinked': NewsShrinked,
     'pane-search-users-shrinked': SearchUsersShrinked,
     'pane-friendlist-shrinked': FriendListShrinked,
     'pane-friendrequests-shrinked': FriendRequestsShrinked,
@@ -66,6 +66,10 @@ const Main = {
   computed: {
     friendMode(){
       let curmode = this.$store.getters.getPaneMode("friends")
+      return curmode
+    },
+    postsMode(){
+      let curmode = this.$store.getters.getPaneMode("posts")
       return curmode
     },
   },
@@ -83,7 +87,9 @@ const Main = {
       <div v-if="isPaneActive('login')" class="activePane"> <router-view></router-view> </div>
       <div v-else class="paneShrinked"> <pane-login-shrinked></pane-login-shrinked></div>
       
-      <div v-if="isPaneActive('myposts')" class="activePane"> <router-view></router-view> </div>
+      <div      v-if="isPaneActive('myposts')" class="activePane"> <router-view></router-view> </div>
+      <div v-else-if="isPaneActive('news')" class="activePane"> <router-view></router-view> </div>
+      <div v-else-if="postsMode === '/news'" class="paneShrinked"> <pane-news-shrinked></pane-news-shrinked> </div>
       <div v-else class="paneShrinked"> <pane-myposts-shrinked></pane-myposts-shrinked></div>
   
       <div v-if="isPaneActive('search_users')" class="activePane"> <router-view></router-view> </div>

@@ -3,9 +3,10 @@ package db_model
 import (
 	"context"
 
+	lab_dbconnect "github.com/yurizabiyaka/hla22/lab_one_backend/lab_dbconnect"
+
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
-	lab_dbconnect "github.com/yurizabiyaka/hla22/lab_one_backend/lab_dbconnect"
 )
 
 func CreateFriendRequest(ctx context.Context, userID, friendID uuid.UUID) error {

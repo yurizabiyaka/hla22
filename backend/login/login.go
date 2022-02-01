@@ -16,15 +16,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type LoginInfo struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 func Login(ctx iris.Context) {
 	session := sessions.Get(ctx)
 
-	loginInfo := LoginInfo{}
+	loginInfo := app_model.LoginInfo{}
 	err := ctx.ReadJSON(&loginInfo)
 	if err != nil {
 		logger.Log().Error(fmt.Errorf("Login: read json error: %w", err).Error())

@@ -43,7 +43,16 @@ function myfriendRequestsDefaults() {
 
 function paneGroupModesDefaults() {
     return {
+        posts: "/myposts",
         friends: "/friend_list"
+    }
+}
+
+function lastNewsResultsDefaults() {
+    return {
+        from: 0,
+        quantity: 25,
+        results: []
     }
 }
 
@@ -58,8 +67,7 @@ const store = Vuex.createStore({
             myfriends: myfriendsDefaults(),
             myFriendRequests: myfriendRequestsDefaults(),
             paneGroupModes: paneGroupModesDefaults(),
-            //---------------------
-            news: []
+            lastNewsResults: lastNewsResultsDefaults(),
         }
     },
     getters: {
@@ -84,9 +92,8 @@ const store = Vuex.createStore({
         getPaneMode: (state) => (paneGroup) => {
             return state.paneGroupModes[paneGroup]
         },
-        //-------------------------
-        news(state) {
-            return state.news;
+        lastNewsResults: (state) => {
+            return state.lastNewsResults;
         },
     },
     mutations: {
@@ -108,6 +115,7 @@ const store = Vuex.createStore({
             state.loadMyFriendRequests = myfriendRequestsDefaults();
             state.myFriendRequests = myfriendRequestsDefaults();
             state.paneGroupModes = paneGroupModesDefaults();
+            state.lastNewsResults = lastNewsResultsDefaults();
         },
         addNewPost(state, myPost) {
             if (!state.myposts) {
@@ -168,13 +176,16 @@ const store = Vuex.createStore({
         setPaneMode: (state, pane) => {
             state.paneGroupModes[pane.group] = pane.mode
         },
+        setLastNewsResults: (state, lastResults) => {
+            state.lastNewsResults = lastResults
+        },
         //------------------------------
         changeILikeForPostID(state, postID) {
             const postIdx = state.news.findIndex(function (element, index, array) {
                 return element.id === postID
             })
             if (postIdx >= 0) {
-                state.news[postIdx].iLike = state.news[postIdx].iLike ? false : true
+                state.news[postIdx].i_like = state.news[postIdx].i_like ? false : true
             }
         },
         setNews(state, newNews) {
@@ -366,21 +377,23 @@ const store = Vuex.createStore({
                 console.log("acceptFriendRequest ", error);
             }
         },
-        async loadMyNews({ commit, dispatch }) {
+        async loadNews({ commit, dispatch }, { from = 0, quantity = 1 } = {}) {
             try {
-                console.log("loadMyNews called");
+                console.log("loadNews called");
 
                 return makeApiCallNoReauth(config.backendUrl()+"/granted/mynews?" + new URLSearchParams({
+                    from: from,
+                    quantity: quantity
                 }), {
                     method: 'GET',
                     credentials: 'include'
                 }, '', (json) => {
-                    console.log("loadMyNews json: ", json);
+                    //console.log("loadNews json: ", json);
                     return json
                 })
             }
             catch (error) {
-                console.log("loadMyNews", error);
+                console.log("loadNews", error);
             }
         },
         //---------------------------

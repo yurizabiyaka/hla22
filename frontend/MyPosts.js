@@ -38,13 +38,19 @@ const MyPosts = {
                 });
             }
         },
+        changeMode(mode){
+            this.$store.commit('setPaneMode', {group: 'posts', mode: mode})
+        },
     },
     components: {
         'my-post': MyPost
     },
     template: `
     <div class="myPostsPane">
-    <h1> My posts </h1>
+        <table width=100%><tr>
+            <td><h1> My Posts </h1> </td>
+            <td><router-link to="/news" @click="changeMode('/news');">NEWS</router-link> </td>
+        </tr></table>
     <form>
        <div>
         <textarea id="newtext" v-model="newText" required autofocus placeholder="Describe your feelings..."/>
@@ -59,6 +65,7 @@ const MyPosts = {
             <table>
                 <my-post v-for="post in myPosts"
                     :postData="post" 
+                    :key="post.id" 
                 ></my-post>
             </table>
         <!--- </div>  -->
