@@ -31,12 +31,19 @@ const Login = {
     },
     template: `
     <div class="loginPane">
-    <h1> Login </h1>
+    <div class=navi>        
+        <table width=100%>
+            <tr><td><h1> Login </h1></td></tr>
+            <tr><td> <a href='' @click="logMeOut($event)">LOGOUT</a></td></tr>
+        </table>
+    </div>
     <table width=100%>
-        <tr><td> <a href='' @click="logMeOut($event)">LOGOUT</a></td></tr>
-        <tr><td>{{ this.$store.getters.isAuthenticated ? "Welcome "+ this.$store.getters.getUser.email  : "Login required"}} </td> </tr>
-        <tr><td> <sign-in /> </td></tr>
-        <tr><td> <register /> </td></tr>
+        <tr><td colspan=3>{{ this.$store.getters.isAuthenticated ? "Welcome "+ this.$store.getters.getUser.email  : "Login required"}} </td> </tr>
+        <tr>
+            <td align=left valign=top width=40%> <sign-in /> </td>
+            <td align=center valign=top> <h1> OR </h1> </td>
+            <td align=right valign=top  width=40%> <register /> </td>
+        </tr>
     </table>
     </div>`
 }
@@ -65,11 +72,13 @@ const LoginShrinked = {
     },
     template: `
     <div class="loginPaneShrinked">
+        <div class=navi>
         <table>
             <tr><td> <router-link to="/">LOGIN</router-link> </td></tr>
             <tr><td> <a href='' @click="logMeOut($event)">LOGOUT</a></td></tr>
-            <tr><td>{{ this.$store.getters.isAuthenticated ? "Welcome "+ this.$store.getters.getUser.email  :"Login required"}} </td> </tr>
         </table>
+        </div>
+        {{ this.$store.getters.isAuthenticated ? "Welcome "+ this.$store.getters.getUser.email  :"Login required"}}
     </div>`
 }
 

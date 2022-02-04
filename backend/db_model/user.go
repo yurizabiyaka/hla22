@@ -72,11 +72,66 @@ func GetUserByID(ctx context.Context, userID uuid.UUID) (*app_model.User, error)
 	return scanUserRow(row)
 }
 
-func GetUserProfilesByIndxRange(ctx context.Context, userID uuid.UUID, from, quantity uint64, opts func(app_model.UserProfile) app_model.UserProfile) ([]app_model.UserProfile, error) {
-	rows, err := lab_dbconnect.Conn().QueryContext(ctx,
-		"SELECT indx, UuidFromBin(id), first_name, surname, birth_year, sex, interests, city, friendship_state "+
-			"FROM users LEFT JOIN friends ON id = friend_id AND user_id = UuidToBin(?) "+
-			"LIMIT ? OFFSET ? ", userID, quantity, from)
+func GetUserProfilesByIndxRange(ctx context.Context, userID uuid.UUID, nameFilter, surnameFilter string, from, quantity uint64, opts func(app_model.UserProfile) app_model.UserProfile) ([]app_model.UserProfile, error) {
+	var rows *sql.Rows
+	var err error
+
+	switch {
+	case nameFilter == "" && surnameFilter == "":
+		// statement, err := lab_dbconnect.Conn().Prepare("SELECT indx, UuidFromBin(id), first_name, surname, birth_year, sex, interests, city, friendship_state " +
+		// 	"FROM users LEFT JOIN friends ON id = friend_id AND user_id = UuidToBin(?) " +
+		// 	"LIMIT ? OFFSET ? ")
+		// if err != nil {
+		// 	logger.Log().Info(fmt.Errorf("GetUserProfilesByIndxRange prepare error: %w", err).Error())
+		// }
+		// fmt.Println(statement.DebugSql())
+		rows, err = lab_dbconnect.Conn().QueryContext(ctx,
+			"SELECT indx, UuidFromBin(id), first_name, surname, birth_year, sex, interests, city, friendship_state "+
+				"FROM users LEFT JOIN friends ON id = friend_id AND user_id = UuidToBin(?) "+
+				"LIMIT ? OFFSET ? ", userID, quantity, from)
+	case nameFilter != "" && surnameFilter == "":
+		// statement, err := lab_dbconnect.Conn().Prepare("SELECT indx, UuidFromBin(id), first_name, surname, birth_year, sex, interests, city, friendship_state " +
+		// 	"FROM users LEFT JOIN friends ON id = friend_id AND user_id = UuidToBin(?) " +
+		// 	"WHERE first_name LIKE ? " +
+		// 	"LIMIT ? OFFSET ? ")
+		// if err != nil {
+		// 	logger.Log().Info(fmt.Errorf("GetUserProfilesByIndxRange prepare error: %w", err).Error())
+		// }
+		// fmt.Println(statement.DebugSql())
+		rows, err = lab_dbconnect.Conn().QueryContext(ctx,
+			"SELECT indx, UuidFromBin(id), first_name, surname, birth_year, sex, interests, city, friendship_state "+
+				"FROM users LEFT JOIN friends ON id = friend_id AND user_id = UuidToBin(?) "+
+				"WHERE first_name LIKE ? "+
+				"LIMIT ? OFFSET ? ", userID, nameFilter+"%", quantity, from)
+	case nameFilter == "" && surnameFilter != "":
+		// statement, err := lab_dbconnect.Conn().Prepare("SELECT indx, UuidFromBin(id), first_name, surname, birth_year, sex, interests, city, friendship_state " +
+		// 	"FROM users LEFT JOIN friends ON id = friend_id AND user_id = UuidToBin(?) " +
+		// 	"WHERE surname LIKE ? " +
+		// 	"LIMIT ? OFFSET ? ")
+		// if err != nil {
+		// 	logger.Log().Info(fmt.Errorf("GetUserProfilesByIndxRange prepare error: %w", err).Error())
+		// }
+		// fmt.Println(statement.DebugSql())
+		rows, err = lab_dbconnect.Conn().QueryContext(ctx,
+			"SELECT indx, UuidFromBin(id), first_name, surname, birth_year, sex, interests, city, friendship_state "+
+				"FROM users LEFT JOIN friends ON id = friend_id AND user_id = UuidToBin(?) "+
+				"WHERE surname LIKE ? "+
+				"LIMIT ? OFFSET ? ", userID, surnameFilter+"%", quantity, from)
+	case nameFilter != "" && surnameFilter != "":
+		// statement, err := lab_dbconnect.Conn().Prepare("SELECT indx, UuidFromBin(id), first_name, surname, birth_year, sex, interests, city, friendship_state " +
+		// 	"FROM users LEFT JOIN friends ON id = friend_id AND user_id = UuidToBin(?) " +
+		// 	"WHERE first_name LIKE ? AND surname LIKE ? " +
+		// 	"LIMIT ? OFFSET ? ")
+		// if err != nil {
+		// 	logger.Log().Info(fmt.Errorf("GetUserProfilesByIndxRange prepare error: %w", err).Error())
+		// }
+		// fmt.Println(statement.DebugSql())
+		rows, err = lab_dbconnect.Conn().QueryContext(ctx,
+			"SELECT indx, UuidFromBin(id), first_name, surname, birth_year, sex, interests, city, friendship_state "+
+				"FROM users LEFT JOIN friends ON id = friend_id AND user_id = UuidToBin(?) "+
+				"WHERE first_name LIKE ? AND surname LIKE ? "+
+				"LIMIT ? OFFSET ? ", userID, nameFilter+"%", surnameFilter+"%", quantity, from)
+	}
 	if err != nil {
 		return nil, err
 	}

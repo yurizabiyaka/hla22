@@ -10,15 +10,9 @@ const MyPosts = {
     created() {
         console.log('MYPOSTS created')
     },
-    // beforeUpdate(){
-    //     console.log('MYPOSTS before update')
-    // },
-    // beforeUnmount(){
-    //     console.log('MYPOSTS before unmount')
-    // },
     computed: {
         myPosts() {
-            return this.$store.getters.myposts
+            return this.$store.getters.myPosts
         }
     },
     methods: {
@@ -47,10 +41,12 @@ const MyPosts = {
     },
     template: `
     <div class="myPostsPane">
+        <div class=navi>        
         <table width=100%><tr>
             <td><h1> My Posts </h1> </td>
             <td><router-link to="/news" @click="changeMode('/news');">NEWS</router-link> </td>
         </tr></table>
+        </div>
     <form>
        <div>
         <textarea id="newtext" v-model="newText" required autofocus placeholder="Describe your feelings..."/>
@@ -62,7 +58,7 @@ const MyPosts = {
       </div>
     </form>
          <!--- <div v-for="post in myPosts">  -->
-            <table>
+            <table width=100%>
                 <my-post v-for="post in myPosts"
                     :postData="post" 
                     :key="post.id" 
@@ -77,12 +73,14 @@ const MyPostsShrinked = {
     },
     computed: {
         totalMyPosts() {
-            return this.$store.getters.myposts && this.$store.getters.myposts.length || 0
+            return this.$store.getters.myPosts && this.$store.getters.myPosts.length || 0
         }
     },
     template: `
     <div class="myPostsPaneShrinked">
+    <div class=navi>
     <router-link to="/myposts">MY POSTS</router-link>
+    </div>
     <table>
         <tr>
             <td>Total posts:</td>

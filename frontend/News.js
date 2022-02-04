@@ -10,10 +10,10 @@ const News = {
        }
     },
     created() {
-        const lastResults = this.$store.getters.lastNewsResults;
-        this.requestFrom = lastResults.from;
-        this.requestQuant = lastResults.quantity;
-        this.news = lastResults.results;
+        const newsResults = this.$store.getters.newsResults;
+        this.requestFrom = newsResults.from;
+        this.requestQuant = newsResults.quantity;
+        this.news = newsResults.results;
     },
     methods: {
         changeILikeForPost(postId) {
@@ -32,7 +32,7 @@ const News = {
                         if (answer.news && answer.news.length) {
                             this.requestFrom += answer.news.length;
                             this.news.push(...answer.news);
-                            this.$store.commit('setLastNewsResults', {
+                            this.$store.commit('setNewsResults', {
                                 from: this.requestFrom,
                                 quantity: this.requestQuant,
                                 results: this.news
@@ -56,20 +56,24 @@ const News = {
 
     template: `
     <div class="newsPane">
+        <div class=navi>        
         <table width=100%><tr>
             <td><router-link to="/myposts" @click="changeMode('/myposts');">MY POSTS</router-link> </td>
             <td><h1> News </h1> </td>
         </tr></table>
-        <table width=100%>
-            <news-post v-for="post in news" @change-like="changeILikeForPost"
-                :initialPost="post"
-                :mode="'news'" 
-                :key="post.id" 
-                />
-        </table>
-        <infinite-loading  @infinite="infiniteHandler"> 
-            <template #no-more>no more data</template>
-        </infinite-loading>
+        </div>
+        <div class=infinite infinite-wrapper>
+            <table width=100%>
+                <news-post v-for="post in news" @change-like="changeILikeForPost"
+                    :initialPost="post"
+                    :mode="'news'" 
+                    :key="post.id" 
+                    />
+            </table>
+            <infinite-loading  @infinite="infiniteHandler"> 
+                <template #no-more>no more data</template>
+            </infinite-loading>
+        </div>
     </div>`,
 }
 
@@ -85,7 +89,9 @@ const NewsShrinked = {
     },
    template: `
     <div class="newsPaneShrinked">
+    <div class=navi>
     <router-link to="/news">NEWS</router-link>
+    </div>
     <table>
     <tr> <td>New messages:</td> <td> </td> </tr>
     </table>

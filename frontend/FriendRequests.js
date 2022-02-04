@@ -8,16 +8,23 @@ const FriendRequests = {
             requestFrom: 0,
             requestQuant: 1,
             userProfiles: [],
+            infiniteId: +new Date(),
         }
     },
     created() {
-        const lastResults = this.$store.getters.lastGetFriendRequestsResults;
-        this.totalRequests = lastResults.total;
-        this.requestFrom = lastResults.from;
-        this.requestQuant = lastResults.quantity;
-        this.userProfiles = lastResults.profiles;
+        const friendRequests = this.$store.getters.getFriendRequestsResults;
+        this.totalRequests = friendRequests.total;
+        this.requestFrom = friendRequests.from;
+        this.requestQuant = friendRequests.quantity;
+        this.userProfiles = friendRequests.profiles;
     },
     methods: {
+        clearAndRefresh(){
+            this.requestFrom = 0
+            this.requestQuant = 1
+            this.userProfiles = [];
+            this.infiniteId ++
+        },
         requestFriendRequestsList(state) {
             this.$store.dispatch('loadMyFriendRequests', {
                 from: this.requestFrom,
@@ -30,7 +37,7 @@ const FriendRequests = {
                     if (answer.user_profiles && answer.user_profiles.length){
                         this.requestFrom += answer.user_profiles.length;
                         this.userProfiles.push(...answer.user_profiles);
-                        this.$store.commit('setLastMyFriendRequests', {
+                        this.$store.commit('setFriendRequests', {
                             total: answer.friend_requests_total,
                             from: this.requestFrom,
                             quantity: this.requestQuant,
@@ -53,39 +60,44 @@ const FriendRequests = {
     },
     template: `
     <div class="friendRequestsPane">
+        <div class=navi>
         <table width=100%><tr>
             <td><router-link to="/friend_list" @click="changeMode('/friend_list');">FRIEND LIST</router-link> </td>
-            <td><h1> Friend Requests </h1> </td>
+            <td><div><h1> Friend Requests </h1></div><div> They read you</div></td>
         </tr></table>
-            <div>
-                <span>Total friend requests: {{ totalRequests }} </span>
-            </div>
-            <div>
-                <label for="requestFrom"> Requests displayed: </label>
-                <input id="requestFrom" type="number" v-model="requestFrom" readonly="readonly" />
-            </div>
-            <div>
-                <label for="requestQuantity"> Page size: </label>
-                <input id="requestQuantity" type="number" v-model="requestQuant" required placeholder="Quantity" />
-            </div>
-        <table width=100%>
-            <user-profile v-for="profile in userProfiles" :initialProfile="profile" :key="profile.index" mode="friendrequest" />
-        </table>
-        <infinite-loading  @infinite="requestFriendRequestsList"> 
-            <template #no-more>no more data</template>
-        </infinite-loading>
+        </div>
+        <div>
+            <span>Total friend requests: {{ totalRequests }} </span>
+        </div>
+        <div>
+            <label for="requestFrom"> Requests displayed: </label>
+            <input id="requestFrom" type="number" v-model="requestFrom" readonly="readonly" />
+        </div>
+        <div>
+            <button @click="clearAndRefresh();">Refresh</button>
+        </div>
+        <div class=infinite infinite-wrapper>
+            <table width=100%>
+                <user-profile v-for="profile in userProfiles" :initialProfile="profile" :key="profile.index" mode="friendrequest" />
+            </table>
+            <infinite-loading :identifier="infiniteId" @infinite="requestFriendRequestsList"> 
+                <template #no-more>no more data</template>
+            </infinite-loading>
+        </div>
     </div>`
 }
 
 const FriendRequestsShrinked = {
     computed: {
         friendReqsTotal() {
-            return this.$store.getters.lastGetFriendRequestsResults.total
+            return this.$store.getters.getFriendRequestsResults.total
         }
     },
     template: `
     <div class="friendRequestsPaneShrinked">
-        <router-link to="/friend_requests">FRIEND REQUESTS</router-link>
+        <div class=navi>
+            <router-link to="/friend_requests">FRIEND REQUESTS</router-link>
+        </div>
         <table>
         <tr>
             <td>Requests total:</td>

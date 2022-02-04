@@ -1,7 +1,22 @@
+* { 
+    font-family: Arial, Verdana, sans-serif; /* Рубленый шрифт для текста */ 
+    font-size: 100%; /* Размер текста */ 
+} 
+
+.navi {
+    margin-bottom: 2em;
+}
+
+.infinite {
+    height: 550px;
+    overflow-y: scroll;
+}
+
 /* ------------ MAIN ---------------- */
 
 .boyan {
-    width: 100%
+    width: 100%;
+    /*display:flex;*/
 }
 
 .activePane {
@@ -22,6 +37,7 @@
 
 .defaultPaneShrinked {
     background-color:lightsteelblue;
+    height: 95vh;
 }
 
 /* ------------ LOGIN ---------------- */
@@ -32,6 +48,7 @@
 
 .loginPaneShrinked {
     background-color:lightsteelblue;
+    height: 95vh;
 }
 
 /* ------------ MY POSTS ---------------- */
@@ -42,6 +59,7 @@
 
 .myPostsPaneShrinked {
     background-color:lightsteelblue;
+    height: 95vh;
 }
 
 textarea#newtext {
@@ -64,6 +82,7 @@ textarea#newtext {
 
 .aboutPaneShrinked {
     background-color: lightsteelblue;
+    height: 95vh;
 }
 
 /* ------------ REGISTER ---------------- */
@@ -85,6 +104,7 @@ textarea#newtext {
 
 .searchUsersPaneShrinked {
     background-color: lightsteelblue;
+    height: 95vh;
 }
 
 .user_profile_row_1 {
@@ -105,8 +125,13 @@ textarea#newtext {
     background-color: white;
 }
 
+.friendListPane>.infinite {
+    height: 470px;
+}
+
 .friendListPaneShrinked {
     background-color: lightsteelblue;
+    height: 95vh;
 }
 
 /* ------------ FRIEND REQUESTS ---------------- */
@@ -115,8 +140,13 @@ textarea#newtext {
     background-color: white;
 }
 
+.friendRequestsPane>.infinite {
+    height: 470px;
+}
+
 .friendRequestsPaneShrinked {
     background-color: lightsteelblue;
+    height: 95vh;
 }
 
 /* ----------- NEWS ----------------- */
@@ -127,6 +157,7 @@ textarea#newtext {
 
 .newsPaneShrinked {
     background-color:lightsteelblue;
+    height: 95vh;
 }
 
 /* ----------- TOP ----------------- */

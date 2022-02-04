@@ -50,7 +50,7 @@ export default {
             <span v-if="profile.friendship === 'declined'"> Declined </span>
         </td>
         <td>
-            <button v-if="profile.friendship === 'none'" @click="newFriendRequest"> Add To Friends </button>
+            <button v-if="actions_mode === 'search' && profile.friendship === 'none'" @click="newFriendRequest"> Add To Friends </button>
             <button v-if="actions_mode === 'friendrequest' && profile.friendship === 'requested'" @click="acceptFriendRequest"> Accept </button>
         </td>
 

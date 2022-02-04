@@ -24,7 +24,10 @@ export default {
     },
     template: `
     <div class="signin">
-    <h4>SIGN-IN</h4>
+    <div class=navi>
+      <div><h4>SIGN-IN</h4></div>
+      <div>if you have a password</div>
+    </div>
     <form>
       <div>
         <input id="email" type="email" v-model="email" required autofocus placeholder="Email"/>

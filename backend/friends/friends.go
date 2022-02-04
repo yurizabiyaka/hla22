@@ -29,8 +29,11 @@ func ListPublicProfiles(ctx iris.Context) {
 			return
 		}
 
+		nameFilter := ctx.URLParamDefault("name", "")
+		surnameFilter := ctx.URLParamDefault("surname", "")
+
 		// get from db and convert into front format (with age)
-		userProfiles, err := db_model.GetUserProfilesByIndxRange(ctx.Request().Context(), uuid.MustParse(userId), from, quantity, app_model.UserProfileApp2Front)
+		userProfiles, err := db_model.GetUserProfilesByIndxRange(ctx.Request().Context(), uuid.MustParse(userId), nameFilter, surnameFilter, from, quantity, app_model.UserProfileApp2Front)
 		if err != nil {
 			err := fmt.Errorf("ListPublicProfiles: failed to get profiles: %w", err)
 			logger.Log().Error(err.Error())
@@ -42,7 +45,7 @@ func ListPublicProfiles(ctx iris.Context) {
 			return
 		}
 
-		logger.Log().Info(fmt.Sprintf("ListPublicProfiles: requested from %s, quantity %s, shown %d, quantity %d", ctx.URLParam("from"), ctx.URLParam("quantity"), from, quantity))
+		logger.Log().Info(fmt.Sprintf("ListPublicProfiles: requested from %s, quantity %s, name filter %s, surname filter %s, shown %d", ctx.URLParam("from"), ctx.URLParam("quantity"), nameFilter, surnameFilter, len(userProfiles)))
 
 		ctx.JSON(&struct {
 			UserProfiles []app_model.UserProfile `json:"user_profiles"`

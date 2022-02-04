@@ -15,7 +15,7 @@ async function makeApiCallNoReauth(url, fetchOptions, tag, okCallback) {
     return json;
 }
 
-function myfriendsDefaults() {
+function myFriendsDefaults() {
     return {
         total: 0,
         from: 0,
@@ -24,10 +24,11 @@ function myfriendsDefaults() {
     }
 }
 
-function lastSearchProfilesResultsDefaults() {
+function searchProfilesResultsDefaults() {
     return {
         from: 0,
         quantity: 25,
+        filter: "",
         results: []
     }
 }
@@ -48,11 +49,41 @@ function paneGroupModesDefaults() {
     }
 }
 
-function lastNewsResultsDefaults() {
+function newsResultsDefaults() {
     return {
         from: 0,
         quantity: 25,
         results: []
+    }
+}
+
+function profilesStoreDefaults() {
+    return {
+        profiles: new Map,
+        getProfiles: function (requestedProfiles) {
+            var profilesResult = [];
+            requestedProfiles && requestedProfiles.forEach && requestedProfiles.forEach((currentValue) => {
+                if (currentValue.id && this.profiles.has(currentValue.id)) {
+                    profilesResult.push(this.profiles.get(currentValue.id))
+                } else {
+                    console.log("profilesStore is missing", currentValue && currentValue.id)
+                }
+            }, this)
+            return profilesResult;
+        },
+        updateProfile: function (requestedProfile) {
+            if (requestedProfile && requestedProfile.id) {
+                this.profiles.set(requestedProfile.id, requestedProfile)
+            }
+        },
+        updateProfiles: function (requestedProfiles) {
+            requestedProfiles && requestedProfiles.forEach && requestedProfiles.forEach((currentValue) => {
+                this.profiles.set(currentValue.id, currentValue)
+            }, this)
+        },
+        clear: function() {
+            this.profiles.clear();
+        }
     }
 }
 
@@ -62,12 +93,13 @@ const store = Vuex.createStore({
             user: {},
             authenticated: false,
             logged_out: false,
-            myposts: [],
-            lastSearchProfilesResults: lastSearchProfilesResultsDefaults(),
-            myfriends: myfriendsDefaults(),
+            myPosts: [],
+            profilesStore: profilesStoreDefaults(),
+            searchProfilesResults: searchProfilesResultsDefaults(),
+            myFriends: myFriendsDefaults(), // todo if something changes here, update searchProfilesResults
             myFriendRequests: myfriendRequestsDefaults(),
             paneGroupModes: paneGroupModesDefaults(),
-            lastNewsResults: lastNewsResultsDefaults(),
+            newsResults: newsResultsDefaults(),
         }
     },
     getters: {
@@ -77,23 +109,27 @@ const store = Vuex.createStore({
         isAuthenticated: (state) => {
             return state.authenticated
         },
-        myposts: (state) => {
-            return state.myposts
+        myPosts: (state) => {
+            return state.myPosts
         },
-        lastSearchProfilesResults: (state) => {
-            return state.lastSearchProfilesResults
+        searchProfilesResults: (state) => {
+            var updatedProfiles = state.profilesStore.getProfiles(state.searchProfilesResults.results)
+            state.searchProfilesResults.results = updatedProfiles
+            return state.searchProfilesResults
         },
-        lastGetFriendsResults: (state) => {
-            return state.myfriends
+        getFriendsResults: (state) => {
+            var updatedProfiles = state.profilesStore.getProfiles(state.myFriends.profiles)
+            state.myFriends.profiles = updatedProfiles
+            return state.myFriends
         },
-        lastGetFriendRequestsResults: (state) => {
+        getFriendRequestsResults: (state) => {
             return state.myFriendRequests
         },
         getPaneMode: (state) => (paneGroup) => {
             return state.paneGroupModes[paneGroup]
         },
-        lastNewsResults: (state) => {
-            return state.lastNewsResults;
+        newsResults: (state) => {
+            return state.newsResults;
         },
     },
     mutations: {
@@ -105,65 +141,53 @@ const store = Vuex.createStore({
             state.authenticated = authIsGranted
         },
         setMyPosts(state, allMyPosts) {
-            state.myposts = allMyPosts
+            state.myPosts = allMyPosts
         },
         clearStore(state) {
-            state.myposts = [];
+            state.myPosts = [];
             // TODO make init function
-            state.lastSearchProfilesResults = lastSearchProfilesResultsDefaults();
-            state.myfriends = myfriendsDefaults();
+            state.searchProfilesResults = searchProfilesResultsDefaults();
+            state.myFriends = myFriendsDefaults();
             state.loadMyFriendRequests = myfriendRequestsDefaults();
             state.myFriendRequests = myfriendRequestsDefaults();
             state.paneGroupModes = paneGroupModesDefaults();
-            state.lastNewsResults = lastNewsResultsDefaults();
+            state.newsResults = newsResultsDefaults();
+            state.profilesStore.clear();
         },
         addNewPost(state, myPost) {
-            if (!state.myposts) {
-                state.myposts = []
+            if (!state.myPosts) {
+                state.myPosts = []
             }
-            if (state.myposts.length === 0) {
-                state.myposts.push(myPost)
+            if (state.myPosts.length === 0) {
+                state.myPosts.push(myPost)
             } else {
-                state.myposts.unshift(myPost)
+                state.myPosts.unshift(myPost)
             }
         },
-        setLastSearchProfilesResults(state, lastResults) {
-            state.lastSearchProfilesResults = lastResults
+        setSearchProfilesResults(state, searchResults) {
+            state.searchProfilesResults = searchResults;
+            state.profilesStore.updateProfiles(searchResults.results)
         },
-        updateProfileInLastSearchProfilesResults(state, profile) {
-            const idx = state.lastSearchProfilesResults.results.findIndex((currElement) => {
-                return currElement.id === profile.id
-            })
-            if (idx>=0) {
-                state.lastSearchProfilesResults.results[idx]=profile
-            }
+        updateProfileInSearchProfilesResults(state, profile) {
+            state.profilesStore.updateProfile(profile)
         },
-        setLastGetFriendsResults(state, lastResults) {
-            state.myfriends = lastResults
+        setFriendsResults(state, friendsResults) {
+            state.myFriends = friendsResults
+            state.profilesStore.updateProfiles(friendsResults.profiles)
         },
         addFriendProfile(state, profile) {
-            state.myfriends.total++
-            /*
-            if (!state.myfriends.results) {
-                state.myfriends.results = []
-            }
-            if (state.myfriends.length === 0) {
-                state.myfriends.push(profile)
-            } else {
-                state.myfriends.unshift(profile)
-            }
-            */
+            state.myFriends.total++
         },
         setFriendsTotal(state, results){
-            state.myfriends.total = results.friends_total
+            state.myFriends.total = results.friends_total
         },
-        setLastMyFriendRequests(state, results){
+        setFriendRequests(state, results){
             state.myFriendRequests = results
         },
         setFriendRequestsTotal(state, results){
             state.myFriendRequests.total = results.friend_requests_total
         },
-        updateProfileInLastGetFriendRequestsResults(state, profile) {
+        updateProfileInFriendRequestsResults(state, profile) {
             const idx = state.myFriendRequests.profiles.findIndex((currElement) => {
                 return currElement.id === profile.id
             })
@@ -176,8 +200,8 @@ const store = Vuex.createStore({
         setPaneMode: (state, pane) => {
             state.paneGroupModes[pane.group] = pane.mode
         },
-        setLastNewsResults: (state, lastResults) => {
-            state.lastNewsResults = lastResults
+        setNewsResults: (state, newsResults) => {
+            state.newsResults = newsResults
         },
         //------------------------------
         changeILikeForPostID(state, postID) {
@@ -188,9 +212,6 @@ const store = Vuex.createStore({
                 state.news[postIdx].i_like = state.news[postIdx].i_like ? false : true
             }
         },
-        setNews(state, newNews) {
-            state.news = newNews
-        }
     },
     actions: {
         async submitNewUser({ commit, dispatch }, newUser) {
@@ -295,9 +316,15 @@ const store = Vuex.createStore({
         },
         async requestUserProfiles({ commit, dispatch }, rangeInfo) {
             try {
+                var name, surname;
+                [name, surname] = rangeInfo.filter.split(/\s+/); // js array destructuring
+                if (typeof name === 'undefined') name="";
+                if (typeof surname === 'undefined') surname="";
                 return makeApiCallNoReauth(config.backendUrl()+"/granted/get_profiles?" + new URLSearchParams({
                     from: rangeInfo.from,
-                    quantity: rangeInfo.quantity
+                    quantity: rangeInfo.quantity,
+                    name: name,
+                    surname: surname,
                 }), {
                     method: 'GET',
                     credentials: 'include',
@@ -317,7 +344,7 @@ const store = Vuex.createStore({
                     method: 'PUT',
                     credentials: 'include',
                 }, 'profile', (profile) => {
-                    commit('updateProfileInLastSearchProfilesResults', profile)
+                    commit('updateProfileInSearchProfilesResults', profile)
                     commit('addFriendProfile', profile)
                     return profile
                 })
@@ -368,8 +395,7 @@ const store = Vuex.createStore({
                     method: 'GET',
                     credentials: 'include',
                 }, 'profile', (profile) => {
-                    commit('updateProfileInLastGetFriendRequestsResults', profile)
-                    //commit('addFriendProfile', profile)
+                    commit('updateProfileInFriendRequestsResults', profile)
                     return profile
                 })
             }

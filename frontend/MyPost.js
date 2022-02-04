@@ -4,20 +4,11 @@ export default {
         postData: Object,
     },
     // emits: ['changeLike'],
-    // created() {
-    //     console.log('MYPOST created')
-    // },
-    // beforeUpdate(){
-    //     console.log('MYPOST before update')
-    // },
-    // beforeUnmount(){
-    //     console.log('MYPOST before unmount')
-    // },
     template: `
     <!--- <div class="myPostsPane"> -->
     <!--- <table> -->
         <tr> 
-            <td colspan=3> {{ postData.text }} </td> 
+            <td colspan=3> <span style="white-space: pre;">{{ postData.text }} </span></td> 
         </tr>
         <tr>
             <td> {{ postData.date_time }} </td>
