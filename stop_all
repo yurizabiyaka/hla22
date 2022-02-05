@@ -6,3 +6,4 @@ docker stop web_run
 docker rm web_run
 docker stop mariadb
 docker rm mariadb
+docker ps -a

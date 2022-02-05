@@ -29,17 +29,23 @@ FRONTEND_BACKEND_HOSTANDPORT=localhost:80
 
 # Деплой
 
+## SSL-сертификаты
+
+Убедитесь в наличии SSL-сертификатов для сайта
+
 ## Скачивание репозитория
 
-- выберете папку на сервере
+- выберите папку на сервере
 - `git clone https://github.com/yurizabiyaka/hla22.git`
 - `git checkout master`
 
 ## Первоначальная настройка
 
-- сделайте исполняемыми файлы `start_with_migrations`, `stop_all`
+- Создайте папку `ssl_box` и положите в неё сертификаты сайта для nginx
 
-- настройте файл конфигурации фронта и бэкэнда `env_file_back_and_front`:
+- Сделайте исполняемыми файлы `start_with_migrations`, `stop_all`
+
+- Настройте файл конфигурации фронта и бэкэнда `env_file_back_and_front`:
 
 |parameter name | description |
 | ----------- | ----------- |
@@ -51,11 +57,11 @@ FRONTEND_BACKEND_HOSTANDPORT=localhost:80
 |CORS_ORIGIN | requests from that origin will be allowed by a browser. E.g. if our frontend is running on https host lab-one.ru and port is 80, the setting should be *https://lab-one.ru:80*. This does not corresponds to backend port, but the backend should refer this origin in Access-Control-Allow-Origin header for the browser making the request |
 |LISTEN_HOSTANDPORT | this is where backend listens to requests |
 | <b> frontend parameters </b> |
-|FRONTEND_BACKEND_PROTOCOL | e.g. *http* <br> the protocol used by frontend SPA to make API requests |
+|FRONTEND_BACKEND_PROTOCOL | e.g. *http* OR *https* if you use SSL<br> the protocol used by frontend SPA to make API requests |
 |FRONTEND_BACKEND_HOSTANDPORT | e.g. *localhost:80* <br> this is the backend host and port |
 |FRONTEND_BACKEND_API_PREFIX | e.g. */v1* <br> the backend API calls suffix |
 
-- настройте файл конфигурации nginx `nginx_conf.d/default.conf`. В секцию proxy_pass необходимо вписать имя хоста контейнера, с которым он зарегистрирован в сети. Это то самое имя, которое указано после ключа `--name` в скрипте запуска `./start_with_migrations` (или `./start_wo_migrations`)
+- настройте файл конфигурации nginx `nginx_conf.d/default.conf`. Раскомментируйте блок со строкой `listen 80 default_server;`, 443 порты и пути к SSL-сертификатам, если это необходимо. В секцию proxy_pass необходимо вписать имя хоста контейнера, с которым он зарегистрирован в сети. Это то самое имя, которое указано после ключа `--name` в скрипте запуска `./start_with_migrations` (или `./start_wo_migrations`)
 ```
 server {
     ...

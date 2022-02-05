@@ -6,3 +6,4 @@ docker build ./backend
 docker-compose run -d --rm --name mariadb --service-ports mariadb
 docker-compose run -d --rm --name lab_one_backend_run  --service-ports lab_one_backend 
 docker-compose run -d --rm --name web_run --service-ports web
+docker ps
