@@ -33,7 +33,7 @@ services:
       - "./nginx_conf.d:/etc/nginx/conf.d"
       - "./frontend:/usr/share/nginx/html"
     ports:
-      - "8080:80"
+      - "80:80"
     depends_on:
       - lab_one_backend
 

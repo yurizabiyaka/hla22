@@ -42,29 +42,36 @@ const MyPosts = {
     template: `
     <div class="myPostsPane">
         <div class=navi>        
-        <table width=100%><tr>
-            <td><h1> My Posts </h1> </td>
-            <td><router-link to="/news" @click="changeMode('/news');">NEWS</router-link> </td>
-        </tr></table>
+            <table width=100%><tr>
+                <td><h1> My Posts </h1> </td>
+                <td><router-link to="/news" @click="changeMode('/news');">NEWS</router-link> </td>
+            </tr></table>
         </div>
-    <form>
-       <div>
-        <textarea id="newtext" v-model="newText" required autofocus placeholder="Describe your feelings..."/>
-      </div>
-      <div>
-        <button type="submit" @click="handleSubmit">
-          Share
-        </button>
-      </div>
-    </form>
-         <!--- <div v-for="post in myPosts">  -->
-            <table width=100%>
-                <my-post v-for="post in myPosts"
-                    :postData="post" 
-                    :key="post.id" 
-                ></my-post>
-            </table>
-        <!--- </div>  -->
+        <form>
+            <div>
+                <textarea id="newtext" v-model="newText" required autofocus placeholder="Describe your feelings..."/>
+            </div>
+            <div>
+                <button type="submit" @click="handleSubmit">
+                Share
+                </button>
+            </div>
+        </form>
+        <div class=infinite infinite-wrapper>
+            <!--- <div v-for="post in myPosts">  -->
+                <table width=100%>
+                    <my-post v-for="post in myPosts"
+                        :postData="post" 
+                        :key="post.id" 
+                    ></my-post>
+                </table>
+            <!--- </div>  -->
+            <!--- 
+            <infinite-loading  @infinite="infiniteHandler"> 
+                <template #no-more>no more data</template>
+            </infinite-loading>
+            -->
+        </div>
     </div>`
 }
 

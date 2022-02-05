@@ -57,6 +57,10 @@
     background-color: white;
 }
 
+.myPostsPane>.infinite {
+    height: 400px;
+}
+
 .myPostsPaneShrinked {
     background-color:lightsteelblue;
     height: 95vh;
