@@ -39,7 +39,7 @@ FRONTEND_BACKEND_HOSTANDPORT=localhost:80
 
 - сделайте исполняемыми файлы `start_with_migrations`, `stop_all`
 
-- настройте `env_file_back_and_front`:
+- настройте файл конфигурации фронта и бэкэнда `env_file_back_and_front`:
 
 |parameter name | description |
 | ----------- | ----------- |
@@ -55,12 +55,23 @@ FRONTEND_BACKEND_HOSTANDPORT=localhost:80
 |FRONTEND_BACKEND_HOSTANDPORT | e.g. *localhost:80* <br> this is the backend host and port |
 |FRONTEND_BACKEND_API_PREFIX | e.g. */v1* <br> the backend API calls suffix |
 
+- настройте файл конфигурации nginx `nginx_conf.d/default.conf`:
+```
+server {
+    ...
+    server_name  lab-one.ddns.net;
+    ...
+    location /v1 {
+        proxy_pass http://lab-one.ddns.net:8090/v1;
+```
 
 ## Обновление и деплой
 
 - `git stash push` для сохранения изменений в конфигурационном файле (и прав на исполняемые файлы)
 
 - `git pull`
+
+- `git stash pop`
 
 - если сервисы запущены, остановите их командой `./stop_all`
 
