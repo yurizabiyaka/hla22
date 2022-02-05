@@ -2,6 +2,7 @@
 
 cp ./env_file_back_and_front ./backend/config.env
 ./shell_scripts/convert_kv2json.sh ./env_file_back_and_front > ./frontend/config_env_file.js
-docker-compose up -d --build
-docker-compose run -d --rm --name lab_one_backend_run  --service-ports --entrypoint lab_one_backend lab_one_backend 
-docker-compose run --no-deps -d --rm --name web_run --service-ports web
+docker build ./backend
+docker-compose run -d --rm --name mariadb --service-ports mariadb
+docker-compose run -d --rm --name lab_one_backend_run  --service-ports lab_one_backend 
+docker-compose run -d --rm --name web_run --service-ports web

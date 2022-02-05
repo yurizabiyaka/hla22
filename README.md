@@ -55,14 +55,14 @@ FRONTEND_BACKEND_HOSTANDPORT=localhost:80
 |FRONTEND_BACKEND_HOSTANDPORT | e.g. *localhost:80* <br> this is the backend host and port |
 |FRONTEND_BACKEND_API_PREFIX | e.g. */v1* <br> the backend API calls suffix |
 
-- настройте файл конфигурации nginx `nginx_conf.d/default.conf`:
+- настройте файл конфигурации nginx `nginx_conf.d/default.conf`. В секцию proxy_pass необходимо вписать имя хоста контейнера, с которым он зарегистрирован в сети. Это то самое имя, которое указано после ключа `--name` в скрипте запуска `./start_with_migrations` (или `./start_wo_migrations`)
 ```
 server {
     ...
     server_name  lab-one.ddns.net;
     ...
     location /v1 {
-        proxy_pass http://lab-one.ddns.net:8090/v1;
+        proxy_pass http://lab_one_backend_run:8090/v1;
 ```
 
 ## Обновление и деплой
@@ -77,9 +77,10 @@ server {
 
 - перезапуск включает 
     - преобразование файла `env_file_back_and_front` в конфиги для бэкэнда и фронтэнда
-    - сборку образа *lab_one_backend* соответствующим `Dockerfile` из папки бэкэнда; запуск БД; запуск nginx через `docker-compose`
+    - сборку образа *lab_one_backend* соответствующим `Dockerfile` из папки бэкэнда; запуск БД - через `docker-compose up --build`
     - миграцию БД
-    - запуска контейнера с бэкэндом
+    - запуска контейнера с бэкэндом через `docker-compose run`
+    - запуск nginx через `docker-compose run`
 
     <br>Перезапуск осуществляется скриптом `./start_with_migrations`
     
