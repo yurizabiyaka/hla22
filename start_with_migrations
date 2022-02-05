@@ -2,7 +2,7 @@
 
 cp ./env_file_back_and_front ./backend/config.env
 ./shell_scripts/convert_kv2json.sh ./env_file_back_and_front > ./frontend/config_env_file.js
-docker build ./backend
+docker build -t lab_one_backend ./backend
 docker-compose run -d --rm --name mariadb --service-ports mariadb
 docker-compose pull goose
 docker-compose run --rm goose mysql "dbuser:dbpass@tcp(mariadb:3306)/labonedb" up
