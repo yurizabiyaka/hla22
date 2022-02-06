@@ -32,7 +32,8 @@ func addAccessControlAllowOrigin(ctx iris.Context) {
 func main() {
 	app := iris.New()
 	sess := sessions.New(sessions.Config{Cookie: cookieNameForSessionID, AllowReclaim: true})
-	app.Use(addAccessControlAllowOrigin, sess.Handler())
+	app.Use(sess.Handler())
+	//app.Use(addAccessControlAllowOrigin, sess.Handler())
 	app.Get("/", func(ctx iris.Context) { ctx.Redirect("/v1/logout") })
 
 	v1api := app.Party("/v1")

@@ -6,6 +6,7 @@ import (
 
 	"github.com/yurizabiyaka/hla22/lab_one_backend/app_model"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/authentication"
+	"github.com/yurizabiyaka/hla22/lab_one_backend/cors_allow"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/db_model"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/lab_error"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/logger"
@@ -18,6 +19,9 @@ import (
 
 func Login(ctx iris.Context) {
 	session := sessions.Get(ctx)
+
+	// allow-origin:
+	cors_allow.AddAccessControlAllowOrigin(ctx)
 
 	loginInfo := app_model.LoginInfo{}
 	err := ctx.ReadJSON(&loginInfo)
@@ -89,6 +93,9 @@ func Login(ctx iris.Context) {
 // Logout abandones session auth token
 func Logout(ctx iris.Context) {
 	session := sessions.Get(ctx)
+	
+	// allow-origin:
+	cors_allow.AddAccessControlAllowOrigin(ctx)
 
 	var validToken string
 	if userAuthToken := authentication.GetAuthToken(ctx); userAuthToken != nil {
@@ -117,6 +124,9 @@ func Logout(ctx iris.Context) {
 // ByCreds invokes user info by active session token
 func ByCreds(ctx iris.Context) {
 	session := sessions.Get(ctx)
+
+	// allow-origin:
+	cors_allow.AddAccessControlAllowOrigin(ctx)
 
 	if userAuthToken := authentication.GetAuthToken(ctx); userAuthToken != nil {
 		userID, err := db_model.GetUserIDByTokenAndRefreshToken(ctx.Request().Context(), *userAuthToken)
@@ -157,6 +167,9 @@ func ByCreds(ctx iris.Context) {
 
 // NewUser is an iris handler which creates a new user in db
 func NewUser(ctx iris.Context) {
+	// allow-origin:
+	cors_allow.AddAccessControlAllowOrigin(ctx)
+
 	frontUser := app_model.User{}
 	err := ctx.ReadJSON(&frontUser)
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/app_model"
+	"github.com/yurizabiyaka/hla22/lab_one_backend/cors_allow"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/db_model"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/lab_error"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/logger"
@@ -15,6 +16,9 @@ import (
 )
 
 func ListPublicProfiles(ctx iris.Context) {
+	// allow-origin:
+	cors_allow.AddAccessControlAllowOrigin(ctx)
+
 	if userId, ok := sessions.Get(ctx).Get(app_model.USERID_CTX_KEY).(string); ok {
 		from, err1 := strconv.ParseUint(ctx.URLParamDefault("from", "0"), 10, 64)
 		quantity, err2 := strconv.ParseUint(ctx.URLParamDefault("quantity", "100"), 10, 64)
@@ -56,6 +60,9 @@ func ListPublicProfiles(ctx iris.Context) {
 }
 
 func NewFriendRequest(ctx iris.Context) {
+	// allow-origin:
+	cors_allow.AddAccessControlAllowOrigin(ctx)
+
 	if userId, ok := sessions.Get(ctx).Get(app_model.USERID_CTX_KEY).(string); ok {
 
 		friendID, err := uuid.Parse(ctx.URLParam("friend_id"))
@@ -122,6 +129,9 @@ func NewFriendRequest(ctx iris.Context) {
 }
 
 func ListMyFriends(ctx iris.Context) {
+	// allow-origin:
+	cors_allow.AddAccessControlAllowOrigin(ctx)
+
 	if userId, ok := sessions.Get(ctx).Get(app_model.USERID_CTX_KEY).(string); ok {
 		from, err1 := strconv.ParseUint(ctx.URLParamDefault("from", "0"), 10, 64)
 		quantity, err2 := strconv.ParseUint(ctx.URLParamDefault("quantity", "100"), 10, 64)
@@ -149,6 +159,8 @@ func ListMyFriends(ctx iris.Context) {
 			return
 		}
 
+		logger.Log().Info(fmt.Sprintf("ListMyFriends: user %s", userId))
+
 		ctx.JSON(&struct {
 			FriendsTotal int                     `json:"friends_total"`
 			UserProfiles []app_model.UserProfile `json:"user_profiles"`
@@ -160,6 +172,9 @@ func ListMyFriends(ctx iris.Context) {
 }
 
 func ListMyFriendRequests(ctx iris.Context) {
+	// allow-origin:
+	cors_allow.AddAccessControlAllowOrigin(ctx)
+
 	if userId, ok := sessions.Get(ctx).Get(app_model.USERID_CTX_KEY).(string); ok {
 		from, err1 := strconv.ParseUint(ctx.URLParamDefault("from", "0"), 10, 64)
 		quantity, err2 := strconv.ParseUint(ctx.URLParamDefault("quantity", "100"), 10, 64)
@@ -187,6 +202,8 @@ func ListMyFriendRequests(ctx iris.Context) {
 			return
 		}
 
+		logger.Log().Info(fmt.Sprintf("ListMyFriendRequests: user %s", userId))
+
 		ctx.JSON(&struct {
 			FriendRequestsTotal int                     `json:"friend_requests_total"`
 			UserProfiles        []app_model.UserProfile `json:"user_profiles"`
@@ -198,6 +215,9 @@ func ListMyFriendRequests(ctx iris.Context) {
 }
 
 func AcceptFriendRequest(ctx iris.Context) {
+	// allow-origin:
+	cors_allow.AddAccessControlAllowOrigin(ctx)
+
 	if userId, ok := sessions.Get(ctx).Get(app_model.USERID_CTX_KEY).(string); ok {
 
 		friendID, err := uuid.Parse(ctx.URLParam("friend_id"))

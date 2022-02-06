@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/yurizabiyaka/hla22/lab_one_backend/app_model"
+	"github.com/yurizabiyaka/hla22/lab_one_backend/cors_allow"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/db_model"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/lab_error"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/logger"
@@ -17,6 +18,9 @@ import (
 )
 
 func ListMyPosts(ctx iris.Context) {
+	// allow-origin:
+	cors_allow.AddAccessControlAllowOrigin(ctx)
+
 	if userId, ok := sessions.Get(ctx).Get(app_model.USERID_CTX_KEY).(string); ok {
 		myposts, err := db_model.LoadPosts(ctx.Request().Context(), uuid.MustParse(userId))
 		if err != nil {
@@ -59,6 +63,9 @@ func ListMyPosts(ctx iris.Context) {
 // }
 
 func AddPost(ctx iris.Context) {
+	// allow-origin:
+	cors_allow.AddAccessControlAllowOrigin(ctx)
+
 	if userId, ok := sessions.Get(ctx).Get(app_model.USERID_CTX_KEY).(string); ok {
 		newPost := app_model.NewUserPost{}
 		err := ctx.ReadJSON(&newPost)
@@ -107,6 +114,9 @@ func AddPost(ctx iris.Context) {
 
 // ListMyNews
 func ListMyNews(ctx iris.Context) {
+	// allow-origin:
+	cors_allow.AddAccessControlAllowOrigin(ctx)
+
 	if userId, ok := sessions.Get(ctx).Get(app_model.USERID_CTX_KEY).(string); ok {
 		from, err1 := strconv.ParseUint(ctx.URLParamDefault("from", "0"), 10, 64)
 		quantity, err2 := strconv.ParseUint(ctx.URLParamDefault("quantity", "100"), 10, 64)

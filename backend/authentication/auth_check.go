@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/yurizabiyaka/hla22/lab_one_backend/app_model"
+	"github.com/yurizabiyaka/hla22/lab_one_backend/cors_allow"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/db_model"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/lab_error"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/logger"
@@ -14,6 +15,9 @@ import (
 )
 
 func OptionsStub(ctx iris.Context) {
+	// allow-origin:
+	cors_allow.AddAccessControlAllowOrigin(ctx)
+
 	ctx.StatusCode(iris.StatusNoContent)
 }
 
