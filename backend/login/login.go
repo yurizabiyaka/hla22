@@ -6,6 +6,7 @@ import (
 
 	"github.com/yurizabiyaka/hla22/lab_one_backend/app_model"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/authentication"
+	"github.com/yurizabiyaka/hla22/lab_one_backend/check_user"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/cors_allow"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/db_model"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/lab_error"
@@ -14,7 +15,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/sessions"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func Login(ctx iris.Context) {
@@ -35,35 +35,26 @@ func Login(ctx iris.Context) {
 		return
 	}
 
-	appUser, err := db_model.GetUserByEmail(ctx.Request().Context(), loginInfo.Email)
+	appUser, err := check_user.CheckUserAndPassword(ctx.Request().Context(), loginInfo.Email, loginInfo.Password)
 	if err != nil {
-		logger.Log().Error(fmt.Errorf("Login: get user %s by email error: %w", loginInfo.Email, err).Error())
-		ctx.JSON(&lab_error.LabError{
-			Failed:       true,
-			ErrorCode:    -10, // any db error
-			ErrorMessage: err.Error(),
-		})
-		return
+		if labError, ok := err.(lab_error.LabError); ok {
+			ctx.JSON(&lab_error.LabError{
+				Failed:       true,
+				ErrorCode:    labError.ErrorCode,
+				ErrorMessage: labError.ErrorMessage,
+			})
+			session.Set(app_model.AUTHENTICATED_CTX_KEY, false)
+			return
+		}
 	}
-
 	if appUser == nil {
 		logger.Log().Info(fmt.Sprintf("Login: no such user: %s", loginInfo.Email))
 		ctx.JSON(&lab_error.LabError{
 			Failed:       true,
 			ErrorCode:    -4, // user not found
-			ErrorMessage: "user not found",
+			ErrorMessage: "not authenticated",
 		})
-		return
-	}
-
-	err = bcrypt.CompareHashAndPassword([]byte(appUser.Hash), []byte(loginInfo.Password))
-	if err != nil {
-		logger.Log().Error(fmt.Errorf("Login: user %s compare passwords: %w", loginInfo.Email, err).Error())
-		ctx.JSON(&lab_error.LabError{
-			Failed:       true,
-			ErrorCode:    -4, // passwords not match, let it be -4 also
-			ErrorMessage: "user not found",
-		})
+		session.Set(app_model.AUTHENTICATED_CTX_KEY, false)
 		return
 	}
 
@@ -93,7 +84,7 @@ func Login(ctx iris.Context) {
 // Logout abandones session auth token
 func Logout(ctx iris.Context) {
 	session := sessions.Get(ctx)
-	
+
 	// allow-origin:
 	cors_allow.AddAccessControlAllowOrigin(ctx)
 

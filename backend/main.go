@@ -8,7 +8,7 @@ import (
 	"github.com/yurizabiyaka/hla22/lab_one_backend/login"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/user_posts"
 
-	"github.com/kataras/iris/v12"
+	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/sessions"
 )
 

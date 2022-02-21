@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/yurizabiyaka/hla22/lab_one_backend/app_model"
+	"github.com/yurizabiyaka/hla22/lab_one_backend/check_user"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/cors_allow"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/db_model"
 	"github.com/yurizabiyaka/hla22/lab_one_backend/lab_error"
@@ -49,39 +50,58 @@ func CheckAuth(ctx iris.Context) {
 
 	sess := sessions.Get(ctx)
 
-	for {
-		isAuthenticated, _ := sess.Get(app_model.AUTHENTICATED_CTX_KEY).(bool)
-		if !isAuthenticated { // not in sessions, but maybe backend has been restarted since
-			if userAuthToken := GetAuthToken(ctx); userAuthToken != nil {
-				userID, err := db_model.GetUserIDByTokenAndRefreshToken(ctx.Request().Context(), *userAuthToken)
-				if err != nil {
-					err := fmt.Errorf("checkAuth: cannot check token %s in db: %w", userAuthToken, err)
-					logger.Log().Error(err.Error())
-					break
-				}
-				if userID == nil {
-					break
-				}
+	username, password, _ := ctx.Request().BasicAuth()
+	if username != "" && password != "" {
 
-				isAuthenticated = true
-				sess.Set(app_model.USERID_CTX_KEY, userID.String())
-				sess.Set(app_model.AUTHENTICATED_CTX_KEY, isAuthenticated)
+		appUser, err := check_user.CheckUserAndPassword(ctx.Request().Context(), username, password)
+		if appUser != nil {
+			logger.Log().Info(fmt.Sprintf("checkAuth: basic authentication succeeded for user %s for request %s %s", username, ctx.Request().Method, ctx.RequestPath(true)))
+			sess.Set(app_model.USERID_CTX_KEY, appUser.ID.String())
+			sess.Set(app_model.AUTHENTICATED_CTX_KEY, true)
+			ctx.Next()
 
-				logger.Log().Info(fmt.Sprintf("checkAuth: token %s is valid, userID is: %s", userAuthToken, userID))
-			}
+			return
 		}
-		if isAuthenticated {
-			if userIdStr, ok := sess.Get(app_model.USERID_CTX_KEY).(string); ok {
-				logger.Log().Info(fmt.Sprintf("checkAuth: authenticated user %s for request %s %s", userIdStr, ctx.Request().Method, ctx.RequestPath(true)))
-				ctx.Next()
-				return
-			}
+		if err != nil {
+			logger.Log().Error(err.Error())
 		}
-		break
-	}
+	} else {
+
+		for {
+			isAuthenticated, _ := sess.Get(app_model.AUTHENTICATED_CTX_KEY).(bool)
+			if !isAuthenticated { // not in sessions, but maybe backend has been restarted since
+				if userAuthToken := GetAuthToken(ctx); userAuthToken != nil {
+					userID, err := db_model.GetUserIDByTokenAndRefreshToken(ctx.Request().Context(), *userAuthToken)
+					if err != nil {
+						err := fmt.Errorf("checkAuth: cannot check token %s in db: %w", userAuthToken, err)
+						logger.Log().Error(err.Error())
+						break
+					}
+					if userID == nil {
+						break
+					}
+
+					isAuthenticated = true
+					sess.Set(app_model.USERID_CTX_KEY, userID.String())
+					sess.Set(app_model.AUTHENTICATED_CTX_KEY, isAuthenticated)
+
+					logger.Log().Info(fmt.Sprintf("checkAuth: token %s is valid, userID is: %s", userAuthToken, userID))
+				}
+			}
+			if isAuthenticated {
+				if userIdStr, ok := sess.Get(app_model.USERID_CTX_KEY).(string); ok {
+					logger.Log().Info(fmt.Sprintf("checkAuth: authenticated user %s for request %s %s", userIdStr, ctx.Request().Method, ctx.RequestPath(true)))
+					ctx.Next()
+					return
+				}
+			}
+			break
+		}
+	} // if-else basic auth
 
 	logger.Log().Info(fmt.Sprintf("checkAuth: not auth %s %s", ctx.Request().Method, ctx.RequestPath(true)))
 
+	sess.Set(app_model.AUTHENTICATED_CTX_KEY, false)
 	ctx.StatusCode(iris.StatusForbidden)
 	ctx.JSON(&lab_error.LabError{
 		Failed:       true,
